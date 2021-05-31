@@ -141,18 +141,16 @@ app.post("/filepond", function(req, res, next) {
               recsJson.forEach(function(recJson) {
                 if (prevRec === "PRR") {
                   csvRec.push( {...buffPartialPrr, ... recJson});
-                    // console.log({...recJson});
+                   // console.log({...recJson});
                   prevRec = "";
                 }
                 if (recJson.REC_TYP) {
-
                   (recJson.REC_TYP ==='PRR') ? buffPartialPrr={...recJson}: buffPartialPrr={};
                   (recJson.REC_TYP ==='PRR') ? buffNoLimInfo={...recJson}: null;
                     // (recJson.REC_TYP ==='PRR')? console.log(recJson):null;
                   prevRec = recJson.REC_TYP;
                 }
               });
-
 
     parser.push()
       //to generate csv
@@ -163,18 +161,19 @@ app.post("/filepond", function(req, res, next) {
 
           prrsRec = [...csvRec];
           prrsRec['limit']={};
-          for(var key of Object.keys(limJson) ){
-           csvRec[0][key] = limJson[key].TEST_NUM;
-           csvRec[1][key] = limJson[key].LO_LIMIT;
-           csvRec[2][key] = limJson[key].HI_LIMIT;
-           prrsRec['limit'][key]= {'tnum':limJson[key].TEST_NUM, 'loLim':limJson[key].LO_LIMIT, 'hiLim':limJson[key].HI_LIMIT}
-          }
           for(var key of Object.keys(buffNoLimInfo) ){
            csvRec[0][key] = 0;
            csvRec[1][key] = 0;
            csvRec[2][key] = 0;
            prrsRec['limit'][key]= {'tnum':0, 'loLim':0, 'hiLim':0}
           }
+          for(var key of Object.keys(limJson) ){
+           csvRec[0][key] = limJson[key].TEST_NUM;
+           csvRec[1][key] = limJson[key].LO_LIMIT;
+           csvRec[2][key] = limJson[key].HI_LIMIT;
+           prrsRec['limit'][key]= {'tnum':limJson[key].TEST_NUM, 'loLim':limJson[key].LO_LIMIT, 'hiLim':limJson[key].HI_LIMIT}
+          }
+
           // console.log(csvRec);
           const csv = json2csvParser.parse(csvRec);
 
@@ -188,8 +187,6 @@ app.post("/filepond", function(req, res, next) {
              // res.send( {'id': req.files.filepond.path});
               res.send(JSON.stringify( req.files.filepond.path));
           });
-
-
 
   }) // end of reading STDF record
 
