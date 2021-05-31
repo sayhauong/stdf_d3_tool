@@ -1,0 +1,14 @@
+<%- include("partials/header"); -%>
+
+  <h1><%=title%></h1>
+  <p><%=content%></p>
+
+
+ <%  testRecords.forEach(function(testRecord){ %>
+  <p>
+  <%= testRecord %>
+  </p>
+
+  <% }) %>
+
+<%- include("partials/footer"); -%>
