@@ -1,0 +1,43 @@
+<%- include("partials/header"); -%>
+
+<h1><%=title%></h1>
+<p><%=content%></p>
+
+
+
+<!-- <script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="/script/box.js"></script>
+<script src="/script/d3box.js"></script> -->
+
+<div id="container" class="container-fluid text-center">
+    <h5 id='title' style="color: #3B3B3B;"></h5>
+    <div class="col-sm-2" >
+<div class="list-group" id="testsList"> </div>
+       <!-- <ul class="list-group"  id="testsList" ></ul> -->
+    </div>
+    <div class="col-sm-8">
+       <div id="pointDistributions"></div>
+    </div>
+    <div class="col-sm-2">
+       <div id="controls">
+       </div>
+    </div>
+ </div>
+<script src="/script/globalJs.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.3/jstat.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.min.js"></script>
+<script src="/script/pDxcdf.js"></script>
+<script src="/script/explodingCdfplot.js"></script>
+<script src="/script/testsList.js"></script>
+ <script>
+    // boxPlotFunctions.defaultDistribution('popover');
+// const testName = 'contact_par gpio0 <> V_ESD_GND_SHRT_IO';
+const testName = 'contact_par gpio5 <> V_ESD_GND_OPEN_IO';
+    cdfPlotFunctions.defaultDistribution('d3-tip', testName);
+    // cdfPlotFunctions.demoSetup();
+    testsListFunction.popTestsList("CDF");
+ </script>
+
+
+<%- include("partials/footer"); -%>

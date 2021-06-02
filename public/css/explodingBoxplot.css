@@ -1,0 +1,99 @@
+#container { position: relative; width: 1250px; padding: 8px }
+
+
+.axis {
+  font: 10px sans-serif;
+}
+
+
+  span.tipInfo {
+      font: 10px sans-serif;
+     background: black;
+     padding: 1px 8px;
+
+   }
+
+   span.tipInfo:before {
+        content: "\A";
+        white-space: pre;
+    }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+line.explodingBoxplot.line,
+rect.explodingBoxplot.box
+{
+  stroke: #888;
+  stroke-width: 2px;
+}
+
+line.explodingBoxplot.vline{
+  stroke-dasharray:5,5;
+}
+
+.explodingBoxplot.tip{
+  font: normal 13px 'Lato', 'Open sans', sans-serif;
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: #333333;
+  color: #DDDDDD;
+  border-radius: 2px;
+}
+
+line.explodingCdfplot.line,
+rect.explodingBoxplot.box
+{
+  stroke: #888;
+  stroke-width: 2px;
+}
+
+line.explodingCdfplot.vline{
+  stroke-dasharray:5,5;
+}
+.explodingCdfplot.tip{
+  font: normal 13px 'Lato', 'Open sans', sans-serif;
+  line-height: 1;
+  font-weight: bold;
+  padding: 5px;
+  background: #333333;
+  color: #DDDDDD;
+  border-radius: 2px;
+}
+g.tick text,
+g.axis text{
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+#hiLimit, #loLimit{
+  width:100px;
+  margin: 2px 5px ;
+  text-align: right;
+
+}
+
+/* cdf class */
+/* .bar rect { */
+  /* fill: steelblue; */
+  /* shape-rendering: crispEdges; */
+/* } */
+/* .axis path, .axis line { */
+  /* fill: none; */
+  /* stroke: #000; */
+  /* shape-rendering: crispEdges; */
+/* } */
+.line {
+  fill: none;
+  /* stroke: purple; */
+  stroke-width: 1.5px;
+}

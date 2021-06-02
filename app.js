@@ -222,6 +222,36 @@ app.get("/post", function(req, res){
 
 });
 
+app.get("/bxplot", function(req, res){
+  // const requestedTitle = _.lowerCase(req.params.postName);
+
+    // keysRec=(Object.keys(prrsRec[0]));
+    keysRec="";
+console.log(keysRec.length);
+  res.render("bxplot", {
+    title: "",
+    content: "",
+    testRecords : keysRec
+  } );
+
+
+});
+
+app.get("/cdfplot", function(req, res){
+  // const requestedTitle = _.lowerCase(req.params.postName);
+
+    // keysRec=(Object.keys(prrsRec[0]));
+    keysRec="";
+console.log(keysRec.length);
+  res.render("cdfplot", {
+    title: "",
+    content: "",
+    testRecords : keysRec
+  } );
+
+
+});
+
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });

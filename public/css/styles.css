@@ -11,6 +11,21 @@ html,body{
   position : absolute;
 } */
 
+#testsList {
+  list-style-type: none; /* Remove bullets */
+   padding:0px; /* Remove padding */
+   margin: 0; /* Remove margins */
+   font-size: 6px;
+   height:500px;
+    overflow:hidden;
+    overflow-y:scroll;
+}
+.test-name {
+  list-style-type: none; /* Remove bullets */
+   padding: 1px; /* Remove padding */
+   margin: 0; /* Remove margins */
+   font-size: 12px;
+}
 
 html {
   min-height: 100%;
