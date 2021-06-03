@@ -404,73 +404,65 @@ function explodingCdfplot() {
 
 
 
-          // var highlight = function(d) {
-          //   // console.log("mouseover detected");
-          //   selected_specie = d.site
-          //   d3.selectAll(".dot")
-          //     .transition()
-          //     .duration(200)
-          //     // .style("fill", "lightgrey")
-          //     .attr('fill-opacity', "0.25")
-          //     .attr("r",2.5)
-          //
-          //   // d3.selectAll("." + selected_specie)
-          //   d3.selectAll(".s"+ selected_specie)
-          //     .transition()
-          //     .duration(200)
-          //       .attr('fill-opacity', "1.0")
-          //     // .style("fill",colorScale(g.site)  )
-          //     .attr("r", 5)
-          //     if (events.point && typeof events.point.mouseover == 'function') {
-          //          events.point.mouseover(d, i, d3.select(this), constituents, options);
-          //       }
-          // }
-          //
-          // // Highlight the specie that is hovered
-          // var doNotHighlight = function(d) {
-          //   d3.selectAll(".dot")
-          //     .transition()
-          //     .duration(200)
-          //       .attr('fill-opacity', "1.0")
-          //     // .style("fill", "lightgrey")
-          //     .attr("r", 4)
-          //
-          //     if (events.point && typeof events.point.mouseout == 'function') {
-          //          events.point.mouseout(d, i, d3.select(this), constituents, options);
-          //       }
-          // }
+          var highlight = function(d) {
+            // console.log("mouseover detected");
+            // selected_specie = d.site
+            d3.selectAll(".dot")
+              .transition()
+              .duration(200)
+              // .style("fill", "lightgrey")
+              .attr('fill-opacity', "0.25")
+              .attr("r",2.5)
 
-          var s = d3.select(this).append('g')
-            .attr('class', 'explodingCdfplot dots')
-            .attr('id', 'explodingCdfplot_dots' + options.id + i)
-            .selectAll('.dots')
-            .data([g])
-            .enter()
+            // d3.selectAll("." + selected_specie)
+            d3.selectAll("#dot"+ d.site)
+              .transition()
+              .duration(200)
+                .attr('fill-opacity', "1.0")
+              // .style("fill",colorScale(g.site)  )
+              .attr("r", 5)
+              if (events.point && typeof events.point.mouseover == 'function') {
+                   events.point.mouseover(d, i, d3.select(this), constituents, options);
+                }
+          }
 
+          // Highlight the specie that is hovered
+          var doNotHighlight = function(d) {
+            d3.selectAll(".dot")
+              .transition()
+              .duration(200)
+                .attr('fill-opacity', "1.0")
+              // .style("fill", "lightgrey")
+              .attr("r", 4)
 
-          d3.select('#explodingCdfplot_dots' + options.id + i)
-            .on('click', function(d) {
-              // explode_boxplot(i);
-              // exploded_box_plots.push(i);
-            })
-          // var s = d3.select(this);
+              if (events.point && typeof events.point.mouseout == 'function') {
+                   events.point.mouseout(d, i, d3.select(this), constituents, options);
+                }
+          }
 
           var color = colorScale(g.group);
 
           // var ycum = d3.scale.linear().domain(yScale.domain()).range([options.height - options.margins.top - options.margins.bottom, 0]);
           var ycum = d3.scale.linear().domain(cdfNonLinDom).range(cdfNonLinRange);
 
-          s.append('g')
-            // .selectAll("dot")
-            .attr('class','explodingCdfplot dots')
-            // .attr('id','explodingCdfplot dot' + options.id + i)
+
+          // var s = d3.select(this)
+            var s = d3.select('#' + 'explodingCdfplot' + options.id + i)
+          // .append('g')
+            // .attr('class', 'explodingCdfplot dot')
+            // .attr('id', 'explodingCdfplot_dot' + options.id + i)
+            .selectAll('circle')
             .data(g)
-            .enter()
+          s.enter()
             .append("circle")
-            .attr("class", function(d) {
-              return "dot s" + g.group
-              })
-            .attr("cx", function(d) {
+            .attr('class', 'dot')
+              .attr('id', 'dot'+g.group)
+            s.exit().remove()
+            // .attr("class", function(d) {
+            //   return "dot s" + g.group
+            //   })
+            // s.attr("class","explodingCdfplot dot")
+              s.attr("cx", function(d) {
               return xScale(d.x);
             })
             .attr("cy", function(d) {
@@ -483,20 +475,8 @@ function explodingCdfplot() {
             .style("fill", function(d) {
               return color
             })
-            // .on('mouseover', function(d, i, self) {
-            //    if (events.point && typeof events.point.mouseover == 'function') {
-            //       events.point.mouseover(d, i, d3.select(this), constituents, options);
-            //    }
-            // })
-            // .on('mouseout', function(d, i, self) {
-            //    if (events.point && typeof events.point.mouseout == 'function') {
-            //       events.point.mouseout(d, i, d3.select(this), constituents, options);
-            //    }
-            // })
-            // .on("mouseover", highlight)
-            // .on("mouseleave", doNotHighlight )
-
-
+            .on("mouseover", highlight)
+            .on("mouseleave", doNotHighlight )
 
         };
 
