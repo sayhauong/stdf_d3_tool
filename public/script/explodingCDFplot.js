@@ -165,7 +165,7 @@ function explodingCdfplot() {
         }
 
         var scatterData1;
-        var numBins = 5000;
+        var numBins = 10000;
         var cdfValueRange = d3.extent(data_set.map(function(m) {
           return m[options.axes.y.label];
         }));
@@ -410,16 +410,13 @@ function explodingCdfplot() {
             d3.selectAll(".dot")
               .transition()
               .duration(200)
-              // .style("fill", "lightgrey")
               .attr('fill-opacity', "0.25")
               .attr("r",2.5)
 
-            // d3.selectAll("." + selected_specie)
             d3.selectAll("#dot"+ d.site)
               .transition()
               .duration(200)
                 .attr('fill-opacity', "1.0")
-              // .style("fill",colorScale(g.site)  )
               .attr("r", 5)
               if (events.point && typeof events.point.mouseover == 'function') {
                    events.point.mouseover(d, i, d3.select(this), constituents, options);
@@ -432,7 +429,6 @@ function explodingCdfplot() {
               .transition()
               .duration(200)
                 .attr('fill-opacity', "1.0")
-              // .style("fill", "lightgrey")
               .attr("r", 4)
 
               if (events.point && typeof events.point.mouseout == 'function') {
@@ -442,15 +438,9 @@ function explodingCdfplot() {
 
           var color = colorScale(g.group);
 
-          // var ycum = d3.scale.linear().domain(yScale.domain()).range([options.height - options.margins.top - options.margins.bottom, 0]);
           var ycum = d3.scale.linear().domain(cdfNonLinDom).range(cdfNonLinRange);
 
-
-          // var s = d3.select(this)
             var s = d3.select('#' + 'explodingCdfplot' + options.id + i)
-          // .append('g')
-            // .attr('class', 'explodingCdfplot dot')
-            // .attr('id', 'explodingCdfplot_dot' + options.id + i)
             .selectAll('circle')
             .data(g)
           s.enter()
@@ -458,10 +448,7 @@ function explodingCdfplot() {
             .attr('class', 'dot')
               .attr('id', 'dot'+g.group)
             s.exit().remove()
-            // .attr("class", function(d) {
-            //   return "dot s" + g.group
-            //   })
-            // s.attr("class","explodingCdfplot dot")
+
               s.attr("cx", function(d) {
               return xScale(d.x);
             })
@@ -496,9 +483,7 @@ function explodingCdfplot() {
 
           var guide = d3.svg.line()
             .x(function(d) {
-
               return xScale(d.x);
-              // return xScale(d.x);
             })
             .y(function(d) {
 
@@ -674,7 +659,7 @@ function explodingCdfplot() {
     value = value || Number;
     // // CDF calculation copied from website
     var seriev = data.map(function(m) {
-      console.log(value + ":"+ m[value]);
+      // console.log(value + ":"+ m[value]);
       return m[value];
     }).sort(d3.ascending);
 

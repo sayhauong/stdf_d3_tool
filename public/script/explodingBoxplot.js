@@ -156,10 +156,6 @@ function explodingBoxplot() {
                      return o;
                 });
 
-                // var yScale = d3.scale.linear()
-                //      .domain(d3.extent(data_set.map(function(m) { return m[options.axes.y.label]; } )))
-                //      .range([options.height - options.margins.top - options.margins.bottom, 0])
-                //      .nice();
                 switch(options.limitRangeType){
                   case 'limit':
                     // domain_range =[limit_set[0][options.axes.y.label],limit_set[1][options.axes.y.label]];
@@ -271,8 +267,8 @@ function explodingBoxplot() {
                   .append('g')
                   .attr('class','explodingBoxplot boxcontent')
                   .attr('id', function(d, i) {
-                    console.log(d, );
-                    console.log( i )
+                    // console.log(d, );
+                    // console.log( i )
                      return 'explodingBoxplot' + options.id + i
                    })
 
@@ -517,17 +513,7 @@ function explodingBoxplot() {
                     .each(create_jitter)
                     .each(create_boxplot)
                     .each(draw_boxplot)
-
-                 // chartRoot.selectAll(".explodingBoxplot.boxcontent")
-                 //   // .attr("transform", transform);
-                 //   .attr("cy", function(d) {
-                 //     return yScale(d.y);
-                 //   })
                }
-
-               // function transform(d) {
-               //   // return "translate(" + xScale(d.x) + "," + yScale(d.cum) + ")";
-               // }
 
                if (events.update.end) {
                   setTimeout(function() {
