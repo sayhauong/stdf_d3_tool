@@ -628,7 +628,7 @@ function explodingCdfplot() {
     if (!arguments.length) return data_set;
     value.sort(function(x, y) {
       // return x['Set Score'].split('-').join('')-y['Set Score'].split('-').join('') ;
-      return x['Site'] - y['Site'];
+      return x['SITE_NUM'] - y['SITE_NUM'];
     });
 
     data_set = JSON.parse(JSON.stringify(value));
@@ -674,6 +674,7 @@ function explodingCdfplot() {
     value = value || Number;
     // // CDF calculation copied from website
     var seriev = data.map(function(m) {
+      console.log(value + ":"+ m[value]);
       return m[value];
     }).sort(d3.ascending);
 
@@ -692,7 +693,7 @@ function explodingCdfplot() {
       cdf_data[i]['cum'] = cdf_data[i].y / seriev.length;
     }
 
-    cdf_data.site = data[0]["Site"];
+    cdf_data.site = data[0]["SITE_NUM"];
 
 
     let scatterData = [];

@@ -32,8 +32,8 @@ console.log(path);
 var jsonSample = require(path);
 
 
-var recsJson = [];
-
+var rawRecsJson = [];
+var processedRecsJson = [];
 var keysRec = [];
 
 var limJson = {};
@@ -109,27 +109,50 @@ app.post("/filepond", function(req, res, next) {
     .parser()
     .on('rec', r => {
       var buff = ('%j', r)
-      recsJson.push(buff);
+      rawRecsJson.push(buff);
     })
     .on('part', p => {
       var buff = ('%j', p)
-      recsJson.push(buff);
+      rawRecsJson.push(buff);
     })
 
   rs.on('data', ck => {
     parser.push(ck)
   }).on('end', () => {
 
+// processedRecsJson = {...rawRecsJson};
+rawRecsJson.forEach(function(rawRecJson){
+  var tmpJson = {};
+  Object.keys(rawRecJson).forEach(k=>{
+    tmpJson[k.replace(/\W+/g, ' ').replace(/\s+/g,":")]= rawRecJson[k];
+
+  })
+
+      processedRecsJson.push(tmpJson);
+  // console.log(rawRecJson);
+  // (rawRecJson.REC_TYP === "PTR" &&  rawRecJson.TEST_TXT )? tmpJson["TEST_TXT"]=rawRecJson['TEST_TXT'].replace(/\ +|\W+/g, ' ').replace(/\ /g,":"): null;
+  if (rawRecJson.REC_TYP === "PTR") {
+    if(rawRecJson.hasOwnProperty("LO_LIMIT"))
+    {
+      var testname = rawRecJson.TEST_TXT.replace(/\W+/g, ' ').replace(/\s+/g,":");
+        tmpJson["TEST_TXT"] =testname ;
+    }
+  }
+
+})
+
+// console.log(processedRecsJson);
+
               let prevRec;
               csvRec = [{},{},{}] ; // testnum: loLim: hiLim
 
-              recsJson.forEach(function(recJson) {
+              processedRecsJson.forEach(function(recJson) {
                 // console.log(recJson);
                   if (recJson.REC_TYP === "PTR") {
                     if(recJson.hasOwnProperty("LO_LIMIT"))
                     {
                       var testname = recJson.TEST_TXT;
-                      limJson[testname] =recJson ;
+                      limJson[testname] ={...recJson} ;
                     }
                   }
               });
@@ -138,9 +161,10 @@ app.post("/filepond", function(req, res, next) {
               var buffPartialPrr ;
               var buffNoLimInfo  ;
 
-              recsJson.forEach(function(recJson) {
+              processedRecsJson.forEach(function(recJson) {
                 if (prevRec === "PRR") {
                   csvRec.push( {...buffPartialPrr, ... recJson});
+                    prrsRec.push( {...buffPartialPrr, ... recJson});
                    // console.log({...recJson});
                   prevRec = "";
                 }
@@ -159,28 +183,35 @@ app.post("/filepond", function(req, res, next) {
           const indexOfFirst = req.files.filepond.name.indexOf(".");
           const newFileName = req.files.filepond.name.substr(0,indexOfFirst);
 
-          prrsRec = [...csvRec];
-          prrsRec['limit']={};
+
+          // prrsRec['limit']={};
           for(var key of Object.keys(buffNoLimInfo) ){
            csvRec[0][key] = 0;
            csvRec[1][key] = 0;
            csvRec[2][key] = 0;
-           prrsRec['limit'][key]= {'tnum':0, 'loLim':0, 'hiLim':0}
+           // prrsRec[0][key]= {'tnum':0, 'loLim':0, 'hiLim':0}
           }
           for(var key of Object.keys(limJson) ){
            csvRec[0][key] = limJson[key].TEST_NUM;
            csvRec[1][key] = limJson[key].LO_LIMIT;
            csvRec[2][key] = limJson[key].HI_LIMIT;
-           prrsRec['limit'][key]= {'tnum':limJson[key].TEST_NUM, 'loLim':limJson[key].LO_LIMIT, 'hiLim':limJson[key].HI_LIMIT}
+           // prrsRec[0][key]= {'tnum':limJson[key].TEST_NUM, 'loLim':limJson[key].LO_LIMIT, 'hiLim':limJson[key].HI_LIMIT}
           }
 
           // console.log(csvRec);
-          const csv = json2csvParser.parse(csvRec);
+          const csv = json2csvParser.parse(prrsRec);
 
-          var jsonData = JSON.stringify(csvRec);
+var jsonPlotData={};
+jsonPlotData["data"]= [...prrsRec];
+jsonPlotData["limit"]= {...limJson};
+
+          var jsonData = JSON.stringify(jsonPlotData);
+          // console.log(jsonData);
           fs.writeFile(__dirname + "\\data\\"+ newFileName  + ".json", jsonData, function(err) {
             if (err) throw err;
           });
+
+
 
           fs.writeFile(__dirname + "\\data\\"+ newFileName  + ".csv", csv, function(err) {
             if (err) throw err;

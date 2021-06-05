@@ -162,7 +162,8 @@ function explodingBoxplot() {
                 //      .nice();
                 switch(options.limitRangeType){
                   case 'limit':
-                    domain_range =[limit_set[0][options.axes.y.label],limit_set[1][options.axes.y.label]];
+                    // domain_range =[limit_set[0][options.axes.y.label],limit_set[1][options.axes.y.label]];
+                    domain_range =[limit_set[options.axes.y.label]['LO_LIMIT'],limit_set[options.axes.y.label]['HI_LIMIT']];
                       document.getElementById("limitRadio").checked = true;
                   break;
                   case 'zoom':
@@ -626,7 +627,7 @@ function explodingBoxplot() {
         // console.log(value);
         value.sort(function(x, y) {
           // return x['Set Score'].split('-').join('')-y['Set Score'].split('-').join('') ;
-          return x['Site']-y['Site'] ;
+          return x['SITE_NUM']-y['SITE_NUM'] ;
         });
         data_set = JSON.parse(JSON.stringify(value));
 

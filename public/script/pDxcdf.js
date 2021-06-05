@@ -57,7 +57,7 @@
                           '</span><span class="tipInfo" style="color:#DDDDDD; block:inline" >  ' + value + '</span>';
           // var message = ' <span style="color:' + color + '">' + identifier +
           //               '</span><span style="color:#DDDDDD;" > : ' + value + '</span>';
-console.log(message);
+// console.log(message);
           return message;
        }
 

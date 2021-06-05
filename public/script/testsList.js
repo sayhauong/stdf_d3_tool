@@ -18,7 +18,8 @@
         return;
       }
 
-      for (var key in result.data[0]) {
+      // for (var key in result.data[0]) {
+          for (var key in result.limit) {
         // console.log(key);
 
         // var li = document.createElement("li");
@@ -44,7 +45,7 @@
             });
             // container.call(xbp);
             cdfPlotFunctions.xbp.update();
-            
+
           } else if (plotType === "BOX")  {
             boxPlotFunctions.xbp.options({
               limitRangeType:'limit',

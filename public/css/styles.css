@@ -19,6 +19,7 @@ html,body{
    height:500px;
     overflow:hidden;
     overflow-y:scroll;
+     word-wrap: break-word;
 }
 .test-name {
   list-style-type: none; /* Remove bullets */

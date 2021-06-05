@@ -83,9 +83,10 @@
          xbp.options(
             {
                id:   'demo',
-              loLim :result.limit[0][testName],
-               hiLim :result.limit[1][testName],
-
+              // loLim :result.limit[0][testName],
+              //  hiLim :result.limit[1][testName],
+              loLim :result.limit[testName]["LO_LIMIT"],
+              hiLim :result.limit[testName]["HI_LIMIT"],
 
                data: {
                   // group: 'Set Score',
