@@ -279,13 +279,14 @@ function explodingBoxplot() {
 
 
                var boxContent = chartWrapper
-               .append("g")
-               .attr("clip-path", "url(#clip)")
+               // .append("g")
+               // .attr("clip-path", "url(#clip)")
                .selectAll('.boxcontent')
                 .data(groups)
 
                boxContent.enter()
                   .append('g')
+                   .attr("clip-path", "url(#clip)")
                   .attr('class','explodingBoxplot boxcontent')
                   .attr('id', function(d, i) {
                     // console.log(d, );

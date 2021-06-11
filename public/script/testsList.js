@@ -40,7 +40,7 @@
           } else if (plotType === "BOX") {
             boxPlotFunctions.xbp.options({
               //set limit plot here
-              limitRangeType: 'zoom',
+              limitRangeType: 'limit',
               axes: {
                 y: {
                   // label: e.target.innerText
@@ -54,7 +54,7 @@
           else if (plotType === "HIST") {
             histPlotFunctions.xbp.options({
               //set limit plot here
-              limitRangeType: 'zoom',
+              limitRangeType: 'limit',
               axes: {
                 y: {
                   // label: e.target.innerText

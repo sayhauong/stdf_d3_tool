@@ -290,13 +290,14 @@ function explodingCdfplot() {
 
 
         var cdfContent = chartWrapper
-        .append("g")
-        .attr("clip-path", "url(#clip)")
+        // .append("g")
+        // .attr("clip-path", "url(#clip)")
         .selectAll('.cdfcontent')
           .data(cdfGroups)
 
         cdfContent.enter()
           .append('g')
+          .attr("clip-path", "url(#clip)")
           .attr('class', 'explodingCdfplot cdfcontent')
           .attr('id', function(d, i) {
             // console.log(d );

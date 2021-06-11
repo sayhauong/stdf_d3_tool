@@ -297,12 +297,13 @@ return(
         //   .data(histGroups)
         var histContent = chartWrapper
         // .append("g")
-        .attr("clip-path", "url(#clip)")
+        // .attr("clip-path", "url(#clip)")
         .selectAll('.histcontent')
           .data(histGroups)
 
         histContent.enter()
           .append('g')
+           .attr("clip-path", "url(#clip)")
           .attr('class', 'explodingHistplot histcontent')
           .attr('id', function(d, i) {
             // console.log(d );
