@@ -20,7 +20,7 @@ function explodingBoxplot() {
      loLim: undefined,
      hiLim: undefined,
      domain_range:undefined,
-     limitRangeType: 'limit',  //limit,zoom, custom
+     limitRangeType: 'zoom',  //limit,zoom, custom initial setting for first plot
 
       margins: {
          top:     10,
@@ -122,6 +122,11 @@ function explodingBoxplot() {
             // main chart area
             var chartWrapper = chartRoot.append("g").attr("class", "chartWrapper").attr('id', 'chartWrapper' + options.id)
 
+
+  // use any shape
+
+
+
             mobileScreen = ($( window ).innerWidth() < options.mobileScreenMax ? true : false);
 
             // boolean resize used to disable transitions during resize operation
@@ -160,11 +165,13 @@ function explodingBoxplot() {
                   case 'limit':
                     // domain_range =[limit_set[0][options.axes.y.label],limit_set[1][options.axes.y.label]];
                     domain_range =[limit_set[options.axes.y.label]['LO_LIMIT'],limit_set[options.axes.y.label]['HI_LIMIT']];
-                      document.getElementById("limitRadio").checked = true;
+                    document.getElementById("limitRadio").checked = true;
+                        document.getElementById("zoomRadio").checked = false;
                   break;
                   case 'zoom':
                     domain_range=  d3.extent(data_set.map(function(m) { return m[options.axes.y.label]; } ))
-                      // document.getElementById("zoomRadio").checked;
+                    document.getElementById("limitRadio").checked = false;
+                        document.getElementById("zoomRadio").checked = true;
                   break;
                   case 'custom':
                     domain_range=  [options.loLim,options.hiLim]
@@ -197,13 +204,15 @@ function explodingBoxplot() {
                      .range(Object.keys(colors).map(function(m) { return colors[m]; }));
                 constituents.scales.color = colorScale;
 
+
                 var zoomBeh = d3.behavior.zoom()
                   // .x(xScale)
                   .y(yScale)
                   .scaleExtent([0, 500])
                   .on("zoom", zoom);
 
-                chartRoot.call(zoomBeh).on("dblclick.zoom", null);
+                chartRoot
+                  .call(zoomBeh).on("dblclick.zoom", null);
 
                 if (events.update.ready) { events.update.ready(constituents, options, events); }
 
@@ -259,9 +268,21 @@ function explodingBoxplot() {
                      .style("text-anchor", "middle")
                      .text(options.axes.y.label);
 
+             var clip = chartWrapper.append("defs").append("svg:clipPath")
+                   .attr("id", "clip")
+                   .append("svg:rect")
+                   .attr("id", "clip-rect")
+                   .attr("x", "0")
+                   .attr("y", "0")
+                   .attr("width", options.width)
+                   .attr("height", options.height -options.margins.bottom - 10);
 
-               var boxContent = chartWrapper.selectAll('.boxcontent')
-                  .data(groups)
+
+               var boxContent = chartWrapper
+               .append("g")
+               .attr("clip-path", "url(#clip)")
+               .selectAll('.boxcontent')
+                .data(groups)
 
                boxContent.enter()
                   .append('g')
@@ -280,6 +301,7 @@ function explodingBoxplot() {
                   .each(create_jitter)
                   .each(create_boxplot)
                   .each(draw_boxplot)
+
 
                 function create_jitter(g, i) {
 
@@ -501,19 +523,37 @@ function explodingBoxplot() {
                };
 
                function zoom() {
-                 console.log("zoom detected");
 
-                 chartRoot.select(".explodingBoxplot.y.axis").call(yAxis);
+                 chartRoot
+                 .select(".explodingBoxplot.y.axis")
+                 .call(yAxis);
 
+                 // update limit textview
                  document.getElementById('hiLimit').value =domain_range[1];
                  document.getElementById('loLimit').value =domain_range[0];
 
                  boxContent
                     .attr('transform',function(d){ return 'translate(' + xScale(d.group) + ',0)'; })
-                    .each(create_jitter)
-                    .each(create_boxplot)
+                 //    .each(create_jitter)
+                 //    .each(create_boxplot)
                     .each(draw_boxplot)
+
+                  // chartRoot.selectAll(".line")
+                  //     .attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
+                  //
+                  // }
+
+                  chartRoot.selectAll("circle.point")
+                    // .attr("transform", transform);
+                    .attr('cx', function(d) {
+                      var w = xScale.rangeBand();
+                      return Math.floor(Math.random() *0.8* w)
+                   })
+                   .attr('cy',function(d) {
+                      return 0.8*yScale(d[options.axes.y.label])
+                   })
                }
+
 
                if (events.update.end) {
                   setTimeout(function() {

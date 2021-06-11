@@ -258,8 +258,22 @@ app.get("/bxplot", function(req, res){
 
     // keysRec=(Object.keys(prrsRec[0]));
     keysRec="";
-console.log(keysRec.length);
+// console.log(keysRec.length);
   res.render("bxplot", {
+    title: "",
+    content: "",
+    testRecords : keysRec
+  } );
+
+});
+
+app.get("/histplot", function(req, res){
+  // const requestedTitle = _.lowerCase(req.params.postName);
+
+    // keysRec=(Object.keys(prrsRec[0]));
+    keysRec="";
+console.log(keysRec.length);
+  res.render("histplot", {
     title: "",
     content: "",
     testRecords : keysRec
@@ -273,13 +287,12 @@ app.get("/cdfplot", function(req, res){
 
     // keysRec=(Object.keys(prrsRec[0]));
     keysRec="";
-console.log(keysRec.length);
+// console.log(keysRec.length);
   res.render("cdfplot", {
     title: "",
     content: "",
     testRecords : keysRec
   } );
-
 
 });
 

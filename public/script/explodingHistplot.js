@@ -1,4 +1,4 @@
-function explodingCdfplot() {
+function explodingHistplot() {
 
   // options which should be accessible via ACCESSORS
   var data_set = [];
@@ -152,50 +152,57 @@ function explodingCdfplot() {
         }
 
         if (options.data.group) {
-          groups = d3.nest()
+          histGroups = d3.nest()
             .key(function(k) {
               return k[options.data.group];
             })
             .entries(data_set)
         } else {
-          groups = [{
+          histGroups = [{
             key: '',
             values: data_set
           }]
         }
 
         var scatterData1;
-        var numBins = 5000;
-        var cdfValueRange = d3.extent(data_set.map(function(m) {
+        var numBins = 100;
+        var histValueRange = d3.extent(data_set.map(function(m) {
           return m[options.axes.y.label];
         }));
-        cdfValueRange[1] = cdfValueRange[1] + Math.abs(cdfValueRange[1]) * 0.2;
-        cdfValueRange[0] = cdfValueRange[0] - 0.1;
+        histValueRange[1] = histValueRange[1] + Math.abs(histValueRange[1]) * 0.1;
+        histValueRange[0] = histValueRange[0] - Math.abs(histValueRange[1]) * 0.1;
         var xScale = d3.scale.linear().
-        domain(cdfValueRange).range([0, options.width]);
+        domain(histValueRange).range([0, options.width]);
 
         constituents.scales.X = xScale;
 
         //create CDF info
-        cdfGroups = groups.map(function(g) {
-          var o = compute_cdfplot(g.values, options.axes.y.label, options.width, cdfValueRange, numBins);
+        histGroups = histGroups.map(function(g) {
+          var o = compute_histplot(g.values, options.axes.y.label, options.width, histValueRange, numBins);
           o['group'] = g.key;
           return o;
         });
+  domain_range= [0, d3.max(histGroups, function(d) {
+    // d.y;
+return(
+  d3.max(d, function(e){
+    // console.log(e.y);
+    return e.y;})
+);
+  })];
 
-
-        var cdfNonLinDom =[-0.0001,0.0001,0.001,0.01,0.025,0.1,0.25,0.50, 0.75,0.90,0.975,0.999,0.9999,0.99999,1];
+        var histNonLinDom = [-0.0001, 0.0001, 0.001, 0.01, 0.025, 0.1, 0.25, 0.50, 0.75, 0.90, 0.975, 0.999, 0.9999, 0.99999, 1];
         // var  cdfNonLinRange =[400,371,342,314,285,257,229,200,171,142,114,86,57,29, 0];
-              var yStep = (options.height - options.margins.top - options.margins.bottom)/cdfNonLinDom.length;
-        var  cdfNonLinRange =[];
-        cdfNonLinDom.forEach(function(value,i){
-          cdfNonLinRange.push((options.height - options.margins.top - options.margins.bottom) - i*yStep);
+        var yStep = (options.height - options.margins.top - options.margins.bottom) / histNonLinDom.length;
+        var histNonLinRange = [];
+        histNonLinDom.forEach(function(value, i) {
+          histNonLinRange.push((options.height - options.margins.top - options.margins.bottom) - i * yStep);
         });
         var yScale = d3.scale.linear()
-          // .domain([-0.1, 1.1])
-          // .range([options.height - options.margins.top - options.margins.bottom, 0])
-          .domain(cdfNonLinDom)
-          .range(cdfNonLinRange)
+          .domain(domain_range)
+          .range([options.height - options.margins.top - options.margins.bottom, 0])
+          // .domain(histNonLinDom)
+          // .range(histNonLinRange)
           .nice();
 
 
@@ -224,9 +231,9 @@ function explodingCdfplot() {
         }
         var xAxis = d3.svg.axis().scale(xScale).orient('bottom')
         var yAxis = d3.svg.axis().scale(yScale).orient('left')
-         .tickFormat(d3.format(".5"))
-        .tickValues(cdfNonLinDom)
-        // .tickFormat(options.axes.y.tickFormat)
+          // .tickFormat(d3.format(".5"))
+          // .tickValues(domain_range)
+        .tickFormat(options.axes.y.tickFormat)
 
         // resetArea
         //   .on('dblclick', implode_boxplot);
@@ -236,7 +243,7 @@ function explodingCdfplot() {
 
         update_xAxis.enter()
           .append('g')
-          .attr('class', 'explodingBoxplot x axis')
+          .attr('class', 'explodingHistplot x axis')
           .attr('id', 'xpb_xAxis')
           .append("text")
           .attr('class', 'axis text')
@@ -259,7 +266,7 @@ function explodingCdfplot() {
 
         update_yAxis.enter()
           .append('g')
-          .attr('class', 'explodingBoxplot y axis')
+          .attr('class', 'explodingHistplot y axis')
           .attr('id', 'xpb_yAxis')
           .append("text")
           .attr('class', 'axis text')
@@ -277,26 +284,42 @@ function explodingCdfplot() {
           .style("text-anchor", "middle")
           .text(options.axes.y.label);
 
-        var cdfContent = chartWrapper.selectAll('.boxcontent')
-          .data(cdfGroups)
+          var clip = chartWrapper.append("defs").append("svg:clipPath")
+                .attr("id", "clip")
+                .append("svg:rect")
+                .attr("id", "clip-rect")
+                .attr("x", "0")
+                .attr("y", "0")
+                .attr("width", options.width -options.margins.left - 10)
+                .attr("height", options.height );
 
-        cdfContent.enter()
+        // var histContent = chartWrapper.selectAll('.histcontent')
+        //   .data(histGroups)
+        var histContent = chartWrapper
+        // .append("g")
+        .attr("clip-path", "url(#clip)")
+        .selectAll('.histcontent')
+          .data(histGroups)
+
+        histContent.enter()
           .append('g')
-          .attr('class', 'explodingBoxplot boxcontent')
+          .attr('class', 'explodingHistplot histcontent')
           .attr('id', function(d, i) {
-            return 'explodingBoxplot' + options.id + i
+            // console.log(d );
+            // console.log( i )
+            return 'explodingHistplot' + options.id + i
           })
 
-        cdfContent.exit()
+        histContent.exit()
           .remove();
 
-        cdfContent
+        histContent
           // .attr('transform', function(d) {
           //   return 'translate(' + xScale(d.group) + ',0)';
           // })
-          .each(create_cdfplot)
-          .each(draw_cdfplot)
-          .each(create_scatterplot)
+          .each(create_histplot)
+          .each(draw_histplot)
+          // .each(create_scatterplot)
         // .each(create_histoPlot)
         //  .each(draw_histoPlot)
 
@@ -304,13 +327,13 @@ function explodingCdfplot() {
         function create_jitter(g, i) {
 
           d3.select(this).append('g')
-            .attr('class', 'explodingBoxplot outliers-points')
+            .attr('class', 'explodingHistplot outliers-points')
           d3.select(this).append('g')
-            .attr('class', 'explodingBoxplot normal-points')
+            .attr('class', 'explodingHistplot normal-points')
         };
 
         function init_jitter(s) {
-          s.attr('class', 'explodingBoxplot point')
+          s.attr('class', 'explodingHistplot point')
             .attr('r', options.datapoints.radius)
             .attr('fill', function(d) {
               return colorScale(d[options.data.color_index])
@@ -346,74 +369,25 @@ function explodingCdfplot() {
             })
         };
 
-        function create_histoPlot(g, i) {
+
+
+        function create_histplot(g, i) {
 
           var s = d3.select(this).append('g')
-            .attr('class', 'explodingBoxplot box')
-            .attr('id', 'explodingCdfplot_box' + options.id + i)
-            .selectAll('.box')
-            .data([g])
-            .enter()
-
-        };
-
-        function draw_histoPlot(g, i) {
-          //Draw svg
-          d3.select('#explodingCdfplot_box' + options.id + i)
-            .on('click', function(d) {
-              // explode_boxplot(i);
-              // exploded_box_plots.push(i);
-            })
-
-          var barColor = colorScale(g.site);
-          var s = d3.select(this);
-
-          //Axes and scales
-          var yhist = d3.scale.linear()
-            .domain([0, d3.max(g, function(d) {
-              return d.y;
-            })])
-            .range([options.height - options.margins.top - options.margins.bottom, 0]);
-
-          // var ycum = d3.scale.linear().domain([0, 1]).range([options.height, 0]);
-          var ycum = d3.scale.linear().domain([0, 1]).range([options.height - options.margins.top - options.margins.bottom, 0]);
-
-          // Draw histogram
-          var bar = s.selectAll(".bar")
-            .data(g)
-            .enter().append("g")
-            .attr("class", "bar")
-            .attr("transform", function(d) {
-
-              return "translate(" + xScale(d.x) + "," + yhist(d.y) + ")";
-            });
-
-          bar.append("rect")
-            .attr("x", 1)
-            .attr("width", options.width / numBins / 1.3)
-            .attr("height", function(d) {
-              return yhist(0) - yhist(d.y);
-            })
-            .attr('fill', barColor);
-        };
-
-        function create_cdfplot(g, i) {
-
-          var s = d3.select(this).append('g')
-            .attr('class', 'explodingBoxplot box')
-            .attr('id', 'explodingCdfplot_box' + options.id + i)
+            .attr('class', 'explodingHistplot bar')
+            .attr('id', 'explodingHistplot_box' + options.id + i)
             .selectAll('.box')
             .data([g])
             .enter()
 
           // s.append('line').attr('class', 'explodingBoxplot line max vline') //max vline
-          s.append('path').attr('class', 'line')
+          s.append('rect').attr('class', 'bar')
 
         };
 
-        function draw_cdfplot(g, i) {
+        function draw_histplot(g, i) {
           //Draw svg
-          d3.select('#explodingCdfplot_box' + options.id + i)
+          d3.select('#explodingHistplot_box' + options.id + i)
             .on('click', function(d) {
               // explode_boxplot(i);
               // exploded_box_plots.push(i);
@@ -421,105 +395,107 @@ function explodingCdfplot() {
 
           var s = d3.select(this);
 
-          // var ycum = d3.scale.linear().domain([0, 1]).range([options.height, 0]);
-          var ycum = d3.scale.linear().domain([0, 1]).range([options.height - options.margins.top - options.margins.bottom, 0]);
 
-          var guide = d3.svg.line()
-            .x(function(d) {
+          var bar = s.selectAll('#explodingHistplot_box' + options.id + i)
+          .selectAll('rect')
+              .data(g)
+            bar.enter().
+            append("rect")
+              .attr("class", "bar")
+                .attr('id', 'bar'+g.group);
 
-              return xScale(d.x);
-              // return xScale(d.x);
-            })
-            .y(function(d) {
 
-              return ycum(d.cum);
-            })
-            .interpolate('basis');
+              bar.exit().remove()
 
-          s.select('path')
-            .datum(g)
-            .attr('d', guide)
-            .attr('stroke', function(d) {
-              return colorScale(d.site);
-            });
+          // bar.append("rect")
+              bar.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
+              .attr("xScale", 1)
+              .attr("width", (xScale(g[0].dx) - xScale(0)) - 1)
+              .attr("height", function(d) {
+                return  options.height - options.margins.top - options.margins.bottom - yScale(d.y);
+                // return options.height - yScale(d.y);
+               })
+              .attr("fill", function(d) { return colorScale(d.y) })
+                    .style("opacity", 0.6)
+              .on("mouseover",  function(d){if (events.point && typeof events.point.mouseover == 'function') {
+                     events.point.mouseover(d, i, d3.select(this), constituents, options);
+                  }})
+                .on("mouseout", function(d){  if (events.point && typeof events.point.mouseout == 'function') {
+                       events.point.mouseout(d, i, d3.select(this), constituents, options);
+                    }});
 
         };
 
         function create_scatterplot(g, i) {
 
-          var s = d3.select(this).append('g')
-            .attr('class', 'explodingBoxplot box')
-            .attr('id', 'explodingCdfplot_box' + options.id + i)
-            .selectAll('.box')
-            .data([g])
-            .enter()
-
-          d3.select('#explodingCdfplot_box' + options.id + i)
-            .on('click', function(d) {
-              // explode_boxplot(i);
-              // exploded_box_plots.push(i);
-            })
-
-          var s = d3.select(this);
 
 
-          var color = colorScale(g.site);
+          var highlight = function(d) {
+            // console.log("mouseover detected");
+            // selected_specie = d.site
+            d3.selectAll(".dot")
+              .transition()
+              .duration(200)
+              .attr('fill-opacity', "0.25")
+              .attr("r",2.5)
 
-          // var ycum = d3.scale.linear().domain(yScale.domain()).range([options.height - options.margins.top - options.margins.bottom, 0]);
-
-            var ycum = d3.scale.linear().domain(cdfNonLinDom).range(cdfNonLinRange);
-
-
-          function buildScatterData(scatterData) {
-            scatterData = [];
-            g.map(function(d) {
-              if (d.length > 0) {
-                for (var i = 0; i < d.length; i++) {
-                  scatterData.push({
-                    x: d[i],
-                    cum: d.cum,
-                    site: g.site
-                  })
+            d3.selectAll("#dot"+ d.site)
+              .transition()
+              .duration(200)
+                .attr('fill-opacity', "1.0")
+              .attr("r", 5)
+              if (events.point && typeof events.point.mouseover == 'function') {
+                   events.point.mouseover(d, i, d3.select(this), constituents, options);
                 }
-              }
-            })
-            return scatterData;
           }
 
-          scatterData1 = buildScatterData(g);
+          // Highlight the specie that is hovered
+          var doNotHighlight = function(d) {
+            d3.selectAll(".dot")
+              .transition()
+              .duration(200)
+                .attr('fill-opacity', "1.0")
+              .attr("r", 4)
 
-          s.append('g')
-            .selectAll("dot")
-            .data(scatterData1)
-            .enter()
+              if (events.point && typeof events.point.mouseout == 'function') {
+                   events.point.mouseout(d, i, d3.select(this), constituents, options);
+                }
+          }
+
+          var color = colorScale(g.group);
+
+          var ycum = d3.scale.linear().domain(histNonLinDom).range(histNonLinRange);
+
+            var s = d3.select('#' + 'explodingHistplot' + options.id + i)
+            .selectAll('circle')
+            .data(g)
+          s.enter()
             .append("circle")
-            .attr("class", function(d) {
-              return "dot " + d.site
-            })
-            .attr("cx", function(d) {
+            .attr('class', 'dot')
+              .attr('id', 'dot'+g.group)
+            s.exit().remove()
+
+              s.attr("cx", function(d) {
               return xScale(d.x);
             })
             .attr("cy", function(d) {
-              console.log(ycum(d.cum));
+              // console.log(ycum(d.cum));
               return ycum(d.cum);
             })
             .attr("r", function(d) {
-              return (3.5);
+              return (4);
             })
             .style("fill", function(d) {
               return color
             })
-
-          // .on("mouseover", highlight)
-          // .on("mouseleave", doNotHighlight )
-
-
+            .on("mouseover", highlight)
+            .on("mouseleave", doNotHighlight )
 
         };
 
         function draw_scatterplot(g, i) {
           //Draw svg
-          d3.select('#explodingCdfplot_box' + options.id + i)
+          d3.select('#explodingHistplot_box' + options.id + i)
             .on('click', function(d) {
               // explode_boxplot(i);
               // exploded_box_plots.push(i);
@@ -529,13 +505,11 @@ function explodingCdfplot() {
 
 
           // var ycum = d3.scale.linear().domain([0, 1]).range([options.height - options.margins.top - options.margins.bottom, 0]);
-            var ycum = d3.scale.linear().domain(cdfNonLinDom).range(cdfNonLinRange);
+          var ycum = d3.scale.linear().domain(histNonLinDom).range(histNonLinRange);
 
           var guide = d3.svg.line()
             .x(function(d) {
-
               return xScale(d.x);
-              // return xScale(d.x);
             })
             .y(function(d) {
 
@@ -553,145 +527,37 @@ function explodingCdfplot() {
         };
 
         function hide_boxplot(g, i) {
-          var s = this
-          s.select('rect.box')
-            .attr('x', xScale.rangeBand() * 0.5)
-            .attr('width', 0)
-            .attr('y', function(d) {
-              return yScale(d.quartiles[1])
-            })
-            .attr('height', 0)
-          s.selectAll('line') //median line
-            .attr('x1', xScale.rangeBand() * 0.5)
-            .attr('x2', xScale.rangeBand() * 0.5)
-            .attr('y1', function(d) {
-              return yScale(d.quartiles[1])
-            })
-            .attr('y2', function(d) {
-              return yScale(d.quartiles[1])
-            })
         };
 
         function explode_boxplot(i) {
-          d3.select('#' + 'explodingBoxplot' + options.id + i)
-            .select('g.box').transition()
-            .ease(d3.ease('back-in'))
-            .duration((transition_time * 1.5))
-            .call(hide_boxplot)
-
-          var explode_normal = d3.select('#' + 'explodingBoxplot' + options.id + i)
-            .select('.normal-points')
-            .selectAll('.point')
-            .data(groups[i].normal)
-
-          explode_normal.enter()
-            .append('circle')
-
-          explode_normal.exit()
-            .remove()
-
-          explode_normal
-            .attr('cx', xScale.rangeBand() * 0.5)
-            .attr('cy', yScale(groups[i].quartiles[1]))
-            .call(init_jitter)
-            .transition()
-            .ease(d3.ease('back-out'))
-            .delay(function() {
-              return (transition_time * 1.5) + 100 * Math.random()
-            })
-            .duration(function() {
-              return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
-            })
-            .call(draw_jitter)
         };
 
         function jitter_plot(i) {
-          var elem = d3.select('#' + 'explodingBoxplot' + options.id + i)
-            .select('.outliers-points');
-
-          var display_outliers = elem.selectAll('.point')
-            .data(groups[i].outlier)
-
-          display_outliers.enter()
-            .append('circle')
-
-          display_outliers.exit()
-            .remove()
-
-          display_outliers
-            .attr('cx', xScale.rangeBand() * 0.5)
-            .attr('cy', yScale(groups[i].quartiles[1]))
-            .call(init_jitter)
-            .transition()
-            .ease(d3.ease('back-out'))
-            .delay(function() {
-              return (transition_time * 1.5) + 100 * Math.random()
-            })
-            .duration(function() {
-              return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
-            })
-            .call(draw_jitter)
         };
 
         function implode_boxplot(elem, g) {
-          exploded_box_plots = [];
-          chartWrapper.selectAll('.normal-points')
-            .each(function(g) {
-              d3.select(this)
-                .selectAll('circle')
-                .transition()
-                .ease(d3.ease('back-out'))
-                .duration(function() {
-                  return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
-                })
-                .attr('cx', xScale.rangeBand() * 0.5)
-                .attr('cy', yScale(g.quartiles[1]))
-                .remove()
-            })
 
-          chartWrapper.selectAll('.boxcontent')
-            .transition()
-            .ease(d3.ease('back-out'))
-            .duration((transition_time * 1.5))
-            .delay(transition_time)
-            .each(draw_boxplot)
         };
 
-        // function change() {
-        //   xCat = "Carbs";
-        //   xMax = d3.max(data, function(d) {
-        //     return d[xCat];
-        //   });
-        //   xMin = d3.min(data, function(d) {
-        //     return d[xCat];
-        //   });
-        //
-        //   zoomBeh.x(x.domain([xMin, xMax])).y(y.domain([yMin, yMax]));
-        //
-        //   var svg = d3.select("#scatter").transition();
-        //
-        //   svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xCat);
-        //
-        //   objects.selectAll(".dot").transition().duration(1000).attr("transform", transform);
-        // }
+
 
         function zoom() {
-          console.log("zoom detected");
+          // console.log("zoom detected");
 
-          chartRoot.select(".explodingBoxplot.x.axis").call(xAxis);
+          chartRoot.select(".explodingHistplot.x.axis").call(xAxis);
           // chartRoot.select(".y.axis").call(yAxis);
 
-          chartRoot.selectAll(".dot")
+          chartRoot.selectAll(".bar")
             // .attr("transform", transform);
-            .attr("cx", function(d) {
-              return xScale(d.x);
-            })
+            .attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
+            // .attr("cx", function(d) {
+            //   return xScale(d.x);
+            // })
         }
-        function transform(d) {
-         console.log(xScale.range());
-        // return "translate(0,700)";
-         return "translate(" + xScale(d.x) + "," + yScale(d.cum) + ")";
-      }
+
+        // function transform(d) {
+        //   return "translate(" + xScale(d.x) + "," + yScale(d.cum) + ")";
+        // }
 
         if (events.update.end) {
           setTimeout(function() {
@@ -774,7 +640,7 @@ function explodingCdfplot() {
     if (!arguments.length) return data_set;
     value.sort(function(x, y) {
       // return x['Set Score'].split('-').join('')-y['Set Score'].split('-').join('') ;
-      return x['Site'] - y['Site'];
+      return x['SITE_NUM'] - y['SITE_NUM'];
     });
 
     data_set = JSON.parse(JSON.stringify(value));
@@ -815,79 +681,36 @@ function explodingCdfplot() {
   }
 
   // END ACCESSORS
-  var compute_cdfplot = function(data, value, width, cdfValueRange, numBins) {
+  var compute_histplot = function(data, value, width, histValueRange, numBins) {
 
     value = value || Number;
     // // CDF calculation copied from website
     var seriev = data.map(function(m) {
+      // console.log(value + ":"+ m[value]);
       return m[value];
     }).sort(d3.ascending);
 
-    var xScale = d3.scale.linear().domain(cdfValueRange).range([0, width]);
-    var cdf_data = d3.layout.histogram().bins(xScale.ticks(numBins))(seriev);
+    var xScale = d3.scale.linear().domain(histValueRange).range([0, width]);
+    var hist_data = d3.layout.histogram().bins(xScale.ticks(numBins))(seriev);
 
-    for (var i = 1; i < cdf_data.length; i++) {
-      cdf_data[i].y += cdf_data[i - 1].y;
+    for (var i = 1; i < hist_data.length; i++) {
+      hist_data[i].site =data[0]["SITE_NUM"];
     }
-
-    var jstat = this.jStat(seriev);
-
-    for (var i = 0; i < cdf_data.length; i++) {
-      // console.log(jstat.normal(jstat.mean(), jstat.stdev()));
-      // cdf_data[i]['cum'] = jstat.normal(jstat.mean(), jstat.stdev()).cdf(cdf_data[i].x);
-        cdf_data[i]['cum'] = cdf_data[i].y/seriev.length;
-    }
-
-    cdf_data.site = data[0]["Site"];
+    //
+    // var jstat = this.jStat(seriev);
 
 
-    return cdf_data
+    hist_data.site = data[0]["SITE_NUM"];
+
+
+    return hist_data
+    // return scatterData
   }
 
 
 
   var compute_boxplot = function(data, iqr_scaling_factor, value) {
-    iqr_scaling_factor = iqr_scaling_factor || 1.5;
-    value = value || Number;
 
-    var seriev = data.map(function(m) {
-      return m[value];
-    }).sort(d3.ascending);
-
-    var quartiles = [
-      d3.quantile(seriev, 0.25),
-      d3.quantile(seriev, 0.5),
-      d3.quantile(seriev, 0.75)
-    ]
-
-    var iqr = (quartiles[2] - quartiles[0]) * iqr_scaling_factor;
-
-    // separate outliers
-    var max = -Number.MAX_VALUE
-
-    var min = Number.MAX_VALUE
-
-    var box_data = d3.nest()
-      .key(function(d) {
-        var v = d[value];
-        var type = (v < quartiles[0] - iqr || v > quartiles[2] + iqr) ? 'outlier' : 'normal';
-        if (type == 'normal' && (v < min || v > max)) {
-          max = Math.max(max, v);
-          min = Math.min(min, v);
-        }
-        return type;
-      })
-      .map(data);
-
-    if (!box_data.outlier) box_data.outlier = []
-
-    box_data.quartiles = quartiles
-
-    box_data.iqr = iqr
-    box_data.max = max
-    box_data.min = min
-
-    return box_data
   }
 
   return chart;

@@ -39,7 +39,8 @@
 
           } else if (plotType === "BOX") {
             boxPlotFunctions.xbp.options({
-              limitRangeType: 'limit',
+              //set limit plot here
+              limitRangeType: 'zoom',
               axes: {
                 y: {
                   // label: e.target.innerText
@@ -47,12 +48,22 @@
                 }
               }
             });
-
-
-
-
             // container.call(xbp);
             boxPlotFunctions.xbp.update();
+          }
+          else if (plotType === "HIST") {
+            histPlotFunctions.xbp.options({
+              //set limit plot here
+              limitRangeType: 'zoom',
+              axes: {
+                y: {
+                  // label: e.target.innerText
+                  label: e.target.id
+                }
+              }
+            });
+            // container.call(xbp);
+            histPlotFunctions.xbp.update();
           }
         });
         ul.appendChild(li);
@@ -64,7 +75,7 @@
           if (filter) {
             for (var i = 0; i < lis.length; i++) {
               var name = lis[i].innerHTML;
-              if (name.toUpperCase().indexOf(filter) > 0)
+              if (name.toUpperCase().indexOf(filter) >= 0)
                 lis[i].style.display = 'list-item';
               else
                 lis[i].style.display = 'none';

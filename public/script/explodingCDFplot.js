@@ -279,7 +279,20 @@ function explodingCdfplot() {
 
         // var cdfContent = chartWrapper.selectAll('.cdfcontent')
         //   .data(cdfGroups)
-        var cdfContent = chartWrapper.selectAll('.cdfcontent')
+        var clip = chartWrapper.append("defs").append("svg:clipPath")
+              .attr("id", "clip")
+              .append("svg:rect")
+              .attr("id", "clip-rect")
+              .attr("x", "0")
+              .attr("y", "0")
+              .attr("width", options.width -options.margins.left - 10)
+              .attr("height", options.height );
+
+
+        var cdfContent = chartWrapper
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .selectAll('.cdfcontent')
           .data(cdfGroups)
 
         cdfContent.enter()
