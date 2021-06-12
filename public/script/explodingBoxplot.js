@@ -268,6 +268,50 @@ function explodingBoxplot() {
                      .style("text-anchor", "middle")
                      .text(options.axes.y.label);
 
+                     update_lim = chartWrapper
+                                .selectAll('#xbp_lim')
+                               .data(domain_range);
+
+                  update_lim.enter()
+                         .append('g')
+                           .attr('class','explodingBoxplot limit-line')
+                           .attr('id',  'xpb_lim')
+
+                  update_lim.exit()
+                     .remove();
+
+                  update_lim
+                  .each(create_limit);
+
+
+                  function create_limit(g, i) {
+                    console.log('cr8limit: ' + g + ' ,i : ' + i);
+                    var s = d3
+                    .select(this)
+                    .append('line')
+                      .attr('id', 'xpb_lim' + i)
+                      .data([g])
+                      .enter();
+
+                var s = d3.select('#xpb_lim' + i);
+
+                s.style("stroke", "lightgreen")
+                            .style("stroke-width", 2)
+                            .attr("x1", -15)
+                            .attr("y1",yScale(g)
+
+                          )
+                            .attr("x2", 600)
+                            .attr("y2",yScale(g)
+
+                          );
+
+                  };
+
+
+
+
+
              var clip = chartWrapper.append("defs").append("svg:clipPath")
                    .attr("id", "clip")
                    .append("svg:rect")
@@ -296,6 +340,7 @@ function explodingBoxplot() {
 
                boxContent.exit()
                   .remove();
+
 
                boxContent
                   .attr('transform',function(d){ return 'translate(' + xScale(d.group) + ',0)'; })
