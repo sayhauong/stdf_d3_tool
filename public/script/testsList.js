@@ -12,8 +12,13 @@
 
     var ul = document.getElementById("tests-list");
 
-    d3.json(default_distributions, function(error, result) {
-      if (error || !result) {
+    // d3.json(default_distributions, function(error, result) {
+      d3.json(default_distributions).then( function(result) {
+      // if (error || !result) {
+      //   console.log(error);
+      //   return;
+      // }
+      if ( !result) {
         console.log(error);
         return;
       }

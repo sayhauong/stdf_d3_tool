@@ -36,9 +36,9 @@
 
    boxPlotFunctions.defineTooltip = defineTooltip;
    function defineTooltip(constituents, options, events) {
-       var tip = d3.tip().attr('class','explodingBoxplot tip')
-            .direction('n')
-            .html(tipFunction)
+       // var tip = d3.tip().attr('class','explodingBoxplot tip')
+            // .direction('n')
+            // .html(tipFunction)
 
        function tipFunction(d) {
           var color = options.data.color_index && d[options.data.color_index] ?
@@ -53,10 +53,10 @@
           return message;
        }
 
-       events.point.mouseover = tip.show;
-       events.point.mouseout = tip.hide;
+       // events.point.mouseover = tip.show;
+       // events.point.mouseout = tip.hide;
 
-       if (constituents.elements.chartRoot) constituents.elements.chartRoot.call(tip);
+       // if (constituents.elements.chartRoot) constituents.elements.chartRoot.call(tip);
    }
 
    boxPlotFunctions.defaultDistribution = defaultDistribution;
@@ -64,9 +64,9 @@
 
       var container = d3.select('#pointDistributions');
 
-      d3.json(default_distributions, function(error, result) {
-         if (error || !result) {
-           console.log(error);
+      d3.json(default_distributions).then( function(result) {
+         if ( !result) {
+           // console.log(error);
            return;
          }
 

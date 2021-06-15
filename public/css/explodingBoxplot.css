@@ -20,11 +20,15 @@
 
 .axis path,
 .axis line {
-  fill: none;
+  /* fill: none; */
   stroke: #000;
   shape-rendering: crispEdges;
 }
-
+.axis text {
+  fill: #888;
+  /* stroke: #000; */
+  shape-rendering: crispEdges;
+}
 line.explodingBoxplot.line,
 rect.explodingBoxplot.box
 {
@@ -93,7 +97,7 @@ g.axis text{
   /* shape-rendering: crispEdges; */
 /* } */
 .line {
-  fill: none;
+  /* fill: none; */
   /* stroke: purple; */
   stroke-width: 1.5px;
 }
