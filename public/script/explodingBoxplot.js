@@ -40,7 +40,7 @@ function explodingBoxplot() {
       },
       y: {
         label: '',
-        ticks: 10,
+        ticks: 20,
         scale: 'linear',
         nice: true,
         tickFormat: function(n) {
@@ -142,11 +142,7 @@ function explodingBoxplot() {
       // main chart area
       var chartWrapper = chartRoot.append("g").attr("class", "chartWrapper").attr('id', 'chartWrapper' + options.id)
 
-
       // use any shape
-
-
-
       mobileScreen = ($(window).innerWidth() < options.mobileScreenMax ? true : false);
 
       // boolean resize used to disable transitions during resize operation
@@ -195,16 +191,11 @@ function explodingBoxplot() {
           value
         }));
 
-        // var xScale = d3.scaleOrdinal()
-        //      .domain([groups].map(function(d) { return d.key } ))
-        //       // .domain(groups.get(function(d) { return d.key } ))
-        //      .rangeRoundBands([0, options.width - options.margins.left - options.margins.right], options.display.boxpadding);
+
         var xScale = d3.scaleBand()
           .domain(groupsArray.map(function(d) {
             return d.key
           }))
-          // .domain(Array.from( groups.keys() ))
-          // .domain(groups.get(function(d) { return d.key } ))
           .rangeRound([0, options.width - options.margins.left - options.margins.right], options.display.boxpadding)
           .padding(0.1);;
         constituents.scales.X = xScale;
@@ -252,11 +243,15 @@ function explodingBoxplot() {
         // domain_range =[loLim,hiLim];
 
         var yScale = d3.scaleLinear()
-          // .domain([limit_set[0][options.axes.y.label],limit_set[1][options.axes.y.label]])
           .domain(domain_range)
           .range([options.height - options.margins.top - options.margins.bottom, 0])
           .nice();
         constituents.scales.Y = yScale;
+
+        var yScale2 = d3.scaleLinear()
+          .domain(domain_range)
+          .range([options.height - options.margins.top - options.margins.bottom, 0])
+          .nice();
 
         colorScale = d3.scaleOrdinal()
 
@@ -269,62 +264,41 @@ function explodingBoxplot() {
 
         constituents.scales.color = colorScale;
 
-        // const clip = DOM.uid("clip");
-
-
-        // const extent = [[options.margins.left, options.margins.top],[options.width-options.margins.right, options.height - options.margins.top - options.margins.bottom]];
 
         var zoomBeh = d3.zoom()
-          .extent([
-            [0, 0],
-            [0, options.height - options.margins.top - options.margins.bottom]
-          ])
+          // .extent([
+          //   [0, 0],
+          //   [0, options.height - options.margins.top - options.margins.bottom]
+          // ])
           // .scaleExtent([-0.1, 30])
-          .scaleExtent([1, 8])
-          // .translateExtent(extent)
-          // .extent(extent)
+          .scaleExtent([-1, 30])
+          .extent([
+            [options.margins.left, 0],
+            [options.width - options.margins.right, options.height]
+          ])
+          // .translateExtent([[options.margins.left, -Infinity], [options.width - options.margins.right, Infinity]])
           .on("zoom", zoom)
 
-        // const gy = chartRoot.append("g");
-
-        function zoom(event) {
-
+        function zoom(event, d) {
 
           var newY = event.transform.rescaleY(yScale);
-          // console.log(newY);
-          // yScale.range([options.height - options.margins.top - options.margins.bottom, 0].map(d => event.transform.applyY(d)));
-          yScale.range([options.height - options.margins.top - options.margins.bottom, 0].map(d => event.transform.applyY(d)));
 
+          yScale
+            .domain(event.transform.rescaleY(yScale2).domain());
 
           chartRoot
             .select(".explodingBoxplot.y.axis")
-            .call(yAxis, newY);
-
-          // update limit textview
-          document.getElementById('hiLimit').value = domain_range[1];
-          document.getElementById('loLimit').value = domain_range[0];
+            .call(yAxis);
+          //
+          // // update limit textview
+          // document.getElementById('hiLimit').value =domain_range[1];
+          // document.getElementById('loLimit').value =domain_range[0];
+          //
+          // update_yAxis.call(yAxis, yScale)
 
           boxContent
-            // .attr("transform", transform)
-            // .attr('transform',function(d){ return 'translate(' + xScale(d.group) + ',0)'; })
-            //    .each(create_jitter)
-            //    .each(create_boxplot)
             .each(draw_boxplot)
 
-          // chartRoot.selectAll(".line")
-          //     .attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
-          //
-          // }
-
-          chartRoot.selectAll("circle.point")
-            // .attr("transform", event.transform)
-            .attr('cx', function(d) {
-              var w = xScale.bandwidth();
-              return Math.floor(Math.random() * 0.8 * w)
-            })
-            .attr('cy', function(d) {
-              return 0.8 * yScale(d[options.axes.y.label])
-            })
         }
 
         chartRoot
@@ -335,8 +309,9 @@ function explodingBoxplot() {
         }
 
         var xAxis = d3.axisBottom().scale(xScale)
-        var yAxis = d3.axisLeft().scale(yScale).tickFormat(options.axes.y.tickFormat)
-
+        // var yAxis = d3.axisLeft().scale(yScale).tickFormat(options.axes.y.tickFormat).tickSizeOuter(0)
+        var yAxis = d3.axisLeft().scale(yScale).tickFormat(options.axes.y.tickFormat);
+        var yAxis2 = d3.axisLeft().scale(yScale2).tickFormat(options.axes.y.tickFormat);
 
         resetArea
           .on('dblclick', implode_boxplot);
@@ -368,12 +343,10 @@ function explodingBoxplot() {
             },
             function(exit) {
               return exit.exit()
-                 .remove();
+                .remove();
             }
 
           )
-
-
 
         update_yAxis = chartWrapper
 
@@ -639,15 +612,18 @@ function explodingBoxplot() {
         };
 
         function hide_boxplot(g, i) {
-          var s = this
-          s.select('rect.box')
+          var s = g
+          // d3.select(g)
+          s
+            .select('rect.box')
             .attr('x', xScale.bandwidth() * 0.5)
             .attr('width', 0)
             .attr('y', function(d) {
               return yScale(d.quartiles[1])
             })
             .attr('height', 0)
-          s.selectAll('line') //median line
+          s
+            .selectAll('line') //median line
             .attr('x1', xScale.bandwidth() * 0.5)
             .attr('x2', xScale.bandwidth() * 0.5)
             .attr('y1', function(d) {
@@ -656,12 +632,14 @@ function explodingBoxplot() {
             .attr('y2', function(d) {
               return yScale(d.quartiles[1])
             })
+          return;
         };
 
         function explode_boxplot(i) {
           d3.select('#' + 'explodingBoxplot' + options.id + i)
-            .select('g.box').transition()
-            .ease(d3.ease('back-in'))
+            .select('g.box')
+            .transition()
+            .ease(d3.easeBackIn)
             .duration((transition_time * 1.5))
             .call(hide_boxplot)
 
@@ -669,26 +647,30 @@ function explodingBoxplot() {
             .select('.normal-points')
             .selectAll('.point')
             .data(groupsArray[i].normal)
-
-          explode_normal.enter()
-            .append('circle')
-
-          explode_normal.exit()
-            .remove()
-
-          explode_normal
+            .join(
+              function(enter) {
+                return enter.append('circle')
+              },
+              function(update) {
+                return update
+              },
+              function(exit) {
+                return exit
+                  .remove();
+              }
+            )
             .attr('cx', xScale.bandwidth() * 0.5)
             .attr('cy', yScale(groupsArray[i].quartiles[1]))
             .call(init_jitter)
             .transition()
-            .ease(d3.ease('back-out'))
+            .ease(d3.easeBackOut)
             .delay(function() {
               return (transition_time * 1.5) + 100 * Math.random()
             })
             .duration(function() {
               return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
             })
-            .call(draw_jitter)
+            .call(draw_jitter, zy)
         };
 
         function jitter_plot(i) {
@@ -717,7 +699,8 @@ function explodingBoxplot() {
 
               },
               function(update) {
-                return update.attr('cx', xScale.bandwidth() * 0.5)
+                return update
+                  .attr('cx', xScale.bandwidth() * 0.5)
                   .attr('cy', yScale(groupsArray[i].quartiles[1]))
                   .call(init_jitter)
                   .call(enter => enter.transition()
@@ -748,7 +731,7 @@ function explodingBoxplot() {
               d3.select(this)
                 .selectAll('circle')
                 .transition()
-                .ease(d3.ease('back-out'))
+                .ease(d3.easeBackOut)
                 .duration(function() {
                   return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
                 })
@@ -759,7 +742,7 @@ function explodingBoxplot() {
 
           chartWrapper.selectAll('.boxcontent')
             .transition()
-            .ease(d3.ease('back-out'))
+            .ease(d3.easeBackOut)
             .duration((transition_time * 1.5))
             .delay(transition_time)
             .each(draw_boxplot)

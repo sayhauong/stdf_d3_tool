@@ -36,11 +36,13 @@
 
    boxPlotFunctions.defineTooltip = defineTooltip;
    function defineTooltip(constituents, options, events) {
-       // var tip = d3.tip().attr('class','explodingBoxplot tip')
-            // .direction('n')
-            // .html(tipFunction)
+       var tip = d3.tip()
+       .attr('class','explodingBoxplot tip')
+          // .attr('class','d3-tip')
+            .direction('n')
+            .html(tipFunction)
 
-       function tipFunction(d) {
+       function tipFunction(e,d) {
           var color = options.data.color_index && d[options.data.color_index] ?
              constituents.scales.color(d[options.data.color_index]) : 'blue';
           var identifier = options.data.identifier && d[options.data.identifier] ?
@@ -53,10 +55,10 @@
           return message;
        }
 
-       // events.point.mouseover = tip.show;
-       // events.point.mouseout = tip.hide;
+       events.point.mouseover = tip.show;
+       events.point.mouseout = tip.hide;
 
-       // if (constituents.elements.chartRoot) constituents.elements.chartRoot.call(tip);
+       if (constituents.elements.chartRoot) constituents.elements.chartRoot.call(tip);
    }
 
    boxPlotFunctions.defaultDistribution = defaultDistribution;
