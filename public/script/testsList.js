@@ -26,6 +26,7 @@
 
         var li = document.createElement("a");
         li.setAttribute("id", key);
+          li.setAttribute("href", '#');
         li.appendChild(document.createTextNode(result.limit[key]['TEST_NUM'] + ":" + key));
         li.classList.add("list-group-item", "list-group-item-action", "test-name");
         li.addEventListener('click', function(e) {

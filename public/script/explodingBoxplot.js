@@ -26,7 +26,7 @@ function explodingBoxplot() {
       top: 10,
       right: 10,
       bottom: 30,
-      left: 40
+      left: 50
     },
 
     axes: {
@@ -185,7 +185,7 @@ function explodingBoxplot() {
           }]
         }
 
-        let keys = Array.from(groups.keys());
+        // let keys = Array.from(groups.keys());
         let groupsArray = Array.from(groups, ([key, value]) => ({
           key,
           value
@@ -363,9 +363,9 @@ function explodingBoxplot() {
                 .append("text")
                 .attr('class', 'axis text')
                 .attr("transform", "rotate(-90)")
-                .attr("x", -options.margins.top - d3.mean(yScale.range()))
+                .attr("x", -options.margins.top *0.95 - d3.mean(yScale.range()))
                 .attr("dy", ".71em")
-                .attr('y', -options.margins.left + 5)
+                .attr('y', -options.margins.left+5 )
                 .style("text-anchor", "middle")
                 .text(options.axes.y.label);
             },
@@ -381,9 +381,9 @@ function explodingBoxplot() {
           .call(yAxis, yScale)
           .select('.axis.text')
           .attr("transform", "rotate(-90)")
-          .attr("x", -options.margins.top - d3.mean(yScale.range()))
+          .attr("x", -options.margins.top *0.95 - d3.mean(yScale.range()))
           .attr("dy", ".71em")
-          .attr('y', -options.margins.left + 5)
+          .attr('y', -options.margins.left+5 )
           .style("text-anchor", "middle")
           .text(options.axes.y.label);
 
@@ -670,7 +670,7 @@ function explodingBoxplot() {
             .duration(function() {
               return (transition_time * 1.5) + (transition_time * 1.5) * Math.random()
             })
-            .call(draw_jitter, zy)
+            .call(draw_jitter)
         };
 
         function jitter_plot(i) {

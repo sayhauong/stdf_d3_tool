@@ -152,11 +152,12 @@ function explodingHistplot() {
         }
 
         if (options.data.group) {
-          histGroups = d3.nest()
-            .key(function(k) {
-              return k[options.data.group];
-            })
-            .entries(data_set)
+          histGroups = d3.group(data_set, d => d[options.data.group]);
+          // histGroups = d3.nest()
+          //   .key(function(k) {
+          //     return k[options.data.group];
+          //   })
+          //   .entries(data_set)
         } else {
           histGroups = [{
             key: '',
@@ -164,32 +165,37 @@ function explodingHistplot() {
           }]
         }
 
+        let histGroupsArray = Array.from(histGroups, ([key, value]) => ({
+          key,
+          value
+        }));
+
         var scatterData1;
-        var numBins = 100;
+        var numBins = 70;
         var histValueRange = d3.extent(data_set.map(function(m) {
           return m[options.axes.y.label];
         }));
         histValueRange[1] = histValueRange[1] + Math.abs(histValueRange[1]) * 0.1;
         histValueRange[0] = histValueRange[0] - Math.abs(histValueRange[1]) * 0.1;
-        var xScale = d3.scale.linear().
-        domain(histValueRange).range([0, options.width]);
-
+        var xScale = d3.scaleLinear().domain(histValueRange).range([0, options.width]);
+        var xScale2 = d3.scaleLinear().domain(histValueRange).range([0, options.width]);
         constituents.scales.X = xScale;
 
         //create CDF info
-        histGroups = histGroups.map(function(g) {
-          var o = compute_histplot(g.values, options.axes.y.label, options.width, histValueRange, numBins);
+        histGroupsArray = histGroupsArray.map(function(g) {
+          var o = compute_histplot(g.value, options.axes.y.label, options.width, histValueRange, numBins);
           o['group'] = g.key;
           return o;
         });
-  domain_range= [0, d3.max(histGroups, function(d) {
-    // d.y;
-return(
-  d3.max(d, function(e){
-    // console.log(e.y);
-    return e.y;})
-);
-  })];
+        domain_range = [0, d3.max(histGroupsArray, function(d) {
+          // d.y;
+          return (
+            d3.max(d, function(e) {
+              // console.log(e.y);
+              return e.length;
+            })
+          );
+        })];
 
         var histNonLinDom = [-0.0001, 0.0001, 0.001, 0.01, 0.025, 0.1, 0.25, 0.50, 0.75, 0.90, 0.975, 0.999, 0.9999, 0.99999, 1];
         // var  cdfNonLinRange =[400,371,342,314,285,257,229,200,171,142,114,86,57,29, 0];
@@ -198,7 +204,7 @@ return(
         histNonLinDom.forEach(function(value, i) {
           histNonLinRange.push((options.height - options.margins.top - options.margins.bottom) - i * yStep);
         });
-        var yScale = d3.scale.linear()
+        var yScale = d3.scaleLinear()
           .domain(domain_range)
           .range([options.height - options.margins.top - options.margins.bottom, 0])
           // .domain(histNonLinDom)
@@ -208,353 +214,339 @@ return(
 
         constituents.scales.Y = yScale;
 
-
-        colorScale = d3.scale.ordinal()
-          .domain(d3.set(data_set.map(function(m) {
-            return m[options.data.color_index];
-          })).values())
+        colorScale = d3.scaleOrdinal()
+          .domain(histGroupsArray.map(function(d) {
+            return d.key;
+          }))
           .range(Object.keys(colors).map(function(m) {
             return colors[m];
           }));
         constituents.scales.color = colorScale;
 
-        var zoomBeh = d3.behavior.zoom()
-          .x(xScale)
+        var zoomBeh = d3.zoom()
+          //.x(xScale)
           // .y(yScale)
           .scaleExtent([0, 500])
           .on("zoom", zoom);
 
+        function zoom(event, d) {
+          // console.log("zoom detected");
+          var newX = event.transform.rescaleX(xScale);
+
+          xScale
+            .domain(event.transform.rescaleX(xScale2).domain());
+
+          chartRoot
+            .select(".explodingCdfplot.x.axis")
+            .call(xAxis);
+          // chartRoot.select(".y.axis").call(yAxis);
+
+          chartRoot.selectAll(".bar")
+            //   // .attr("transform", transform);
+            .attr("transform", function(d) {
+              return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")";
+            })
+          //   // .attr("cx", function(d) {
+          //   //   return xScale(d.x);
+          //   // })
+        }
+
+
         chartRoot.call(zoomBeh);
+
 
         if (events.update.ready) {
           events.update.ready(constituents, options, events);
         }
-        var xAxis = d3.svg.axis().scale(xScale).orient('bottom')
-        var yAxis = d3.svg.axis().scale(yScale).orient('left')
+        var xAxis = d3.axisBottom().scale(xScale)
+        var yAxis = d3.axisLeft().scale(yScale)
           // .tickFormat(d3.format(".5"))
           // .tickValues(domain_range)
-        .tickFormat(options.axes.y.tickFormat)
+          .tickFormat(options.axes.y.tickFormat)
 
         // resetArea
         //   .on('dblclick', implode_boxplot);
 
+        // update_xAxis = chartWrapper.selectAll('#xpb_xAxis')
+        //   .data([0]);
+        //
+        // update_xAxis.enter()
+        //   .append('g')
+        //   .attr('class', 'explodingHistplot x axis')
+        //   .attr('id', 'xpb_xAxis')
+        //   .append("text")
+        //   .attr('class', 'axis text')
+        //
+        // update_xAxis.exit()
+        //   .remove();
+        //
+        // update_xAxis
+        //   .attr("transform", "translate(0," + (options.height - options.margins.top - options.margins.bottom) + ")")
+        //   .call(xAxis)
+        //   .select('.axis.text')
+        //   .attr("x", (options.width - options.margins.left - options.margins.right) / 2)
+        //   .attr("dy", ".71em")
+        //   .attr('y', options.margins.bottom - 10)
+        //   .style("text-anchor", "middle")
+        //   .text(options.axes.x.label);
+
         update_xAxis = chartWrapper.selectAll('#xpb_xAxis')
-          .data([0]);
+          .data([0])
+          .join(
+            function(enter) {
+              return enter.append('g')
+                .attr('class', 'explodingCdfplot x axis')
+                .attr('id', 'xpb_xAxis')
+                .attr("transform", "translate(0," + (options.height - options.margins.top - options.margins.bottom) + ")")
+                .call(xAxis)
 
-        update_xAxis.enter()
-          .append('g')
-          .attr('class', 'explodingHistplot x axis')
-          .attr('id', 'xpb_xAxis')
-          .append("text")
-          .attr('class', 'axis text')
+                .append("text")
+                .attr('class', 'axis text')
+                .attr("x", (options.width - options.margins.left - options.margins.right) / 2)
+                .attr("dy", ".71em")
+                .attr('y', options.margins.bottom - 10)
+                .style("text-anchor", "middle")
+                .text(options.axes.x.label);
+            },
+            function(update) {
+              return update
+                .attr("transform", "translate(0," + (options.height - options.margins.top - options.margins.bottom) + ")")
+                .call(xAxis)
 
-        update_xAxis.exit()
-          .remove();
+            },
+            function(exit) {
+              return exit.exit()
+                .remove();
+            }
 
-        update_xAxis
-          .attr("transform", "translate(0," + (options.height - options.margins.top - options.margins.bottom) + ")")
-          .call(xAxis)
-          .select('.axis.text')
-          .attr("x", (options.width - options.margins.left - options.margins.right) / 2)
-          .attr("dy", ".71em")
-          .attr('y', options.margins.bottom - 10)
-          .style("text-anchor", "middle")
-          .text(options.axes.x.label);
+          )
 
         update_yAxis = chartWrapper.selectAll('#xpb_yAxis')
-          .data([0]);
+          .data([0])
+          .join(
+            function(enter) {
+              return enter.append('g')
+                .attr("clip-path", "url(#clip)")
+                .attr('class', 'explodingCdfplot y axis')
+                .attr('id', 'xpb_yAxis')
+                .call(yAxis, yScale)
+                .append("text")
+                .attr('class', 'axis text')
+                .attr("transform", "rotate(-90)")
+                .attr("x", -options.margins.top * 0.95 - d3.mean(yScale.range()))
+                .attr("dy", ".71em")
+                .attr('y', -options.margins.left + 5)
+                .style("text-anchor", "middle")
+                .text(options.axes.y.label);
+            },
+            function(update) {
+              return update
 
-        update_yAxis.enter()
-          .append('g')
-          .attr('class', 'explodingHistplot y axis')
-          .attr('id', 'xpb_yAxis')
-          .append("text")
-          .attr('class', 'axis text')
-
-        update_yAxis.exit()
-          .remove();
-
-        update_yAxis
-          .call(yAxis)
+            },
+            function(exit) {
+              return exit.remove();
+              //    .remove();
+            }
+          )
+          .call(yAxis, yScale)
           .select('.axis.text')
           .attr("transform", "rotate(-90)")
-          .attr("x", -options.margins.top - d3.mean(yScale.range()))
+          .attr("x", -options.margins.top * 0.95 - d3.mean(yScale.range()))
           .attr("dy", ".71em")
           .attr('y', -options.margins.left + 5)
           .style("text-anchor", "middle")
           .text(options.axes.y.label);
 
-          var clip = chartWrapper.append("defs").append("svg:clipPath")
-                .attr("id", "clip")
-                .append("svg:rect")
-                .attr("id", "clip-rect")
-                .attr("x", "0")
-                .attr("y", "0")
-                .attr("width", options.width -options.margins.left - 10)
-                .attr("height", options.height );
+
+
+        var clip = chartWrapper.append("defs").append("svg:clipPath")
+          .attr("id", "clip")
+          .append("svg:rect")
+          .attr("id", "clip-rect")
+          .attr("x", "-50")
+          .attr("y", "0")
+          .attr("width", options.width)
+          .attr("height", options.height - options.margins.bottom - options.margins.top);
+        // .attr("width", options.width -options.margins.left - 10)
+        // .attr("height", options.height );
 
         // var histContent = chartWrapper.selectAll('.histcontent')
         //   .data(histGroups)
         var histContent = chartWrapper
-        // .append("g")
-        // .attr("clip-path", "url(#clip)")
-        .selectAll('.histcontent')
-          .data(histGroups)
+          // .append("g")
+          // .attr("clip-path", "url(#clip)")
+          .selectAll('.histcontent')
+          .data(histGroupsArray)
+          .join(
+            function(enter) {
+              return enter
+                .append('g')
+                .attr("clip-path", "url(#clip)")
+                .attr('class', 'explodingHistplot histcontent')
+                .attr('id', function(d, i) {
+                  return 'explodingHistplot' + options.id + i
+                })
+              // .each(create_histplot)
+              // .each(draw_histplot)
+            },
+            function(update) {
+              return update
+            },
+            function(exit) {
+              return exit
+                .remove();
+            }
+          )
 
-        histContent.enter()
-          .append('g')
-           .attr("clip-path", "url(#clip)")
-          .attr('class', 'explodingHistplot histcontent')
-          .attr('id', function(d, i) {
-            // console.log(d );
-            // console.log( i )
-            return 'explodingHistplot' + options.id + i
-          })
-
-        histContent.exit()
-          .remove();
-
-        histContent
-          // .attr('transform', function(d) {
-          //   return 'translate(' + xScale(d.group) + ',0)';
-          // })
-          .each(create_histplot)
           .each(draw_histplot)
-          // .each(create_scatterplot)
-        // .each(create_histoPlot)
-        //  .each(draw_histoPlot)
 
-
-        function create_jitter(g, i) {
-
-          d3.select(this).append('g')
-            .attr('class', 'explodingHistplot outliers-points')
-          d3.select(this).append('g')
-            .attr('class', 'explodingHistplot normal-points')
-        };
-
-        function init_jitter(s) {
-          s.attr('class', 'explodingHistplot point')
-            .attr('r', options.datapoints.radius)
-            .attr('fill', function(d) {
-              return colorScale(d[options.data.color_index])
-            })
-            .on('mouseover', function(d, i, self) {
-              if (events.point && typeof events.point.mouseover == 'function') {
-                events.point.mouseover(d, i, d3.select(this), constituents, options);
-              }
-            })
-            .on('mouseout', function(d, i, self) {
-              if (events.point && typeof events.point.mouseout == 'function') {
-                events.point.mouseout(d, i, d3.select(this), constituents, options);
-              }
-            })
-            .on('click', function(d, i, self) {
-              if (events.point && typeof events.point.click == 'function') {
-                events.point.click(d, i, d3.select(this), constituents, options);
-              }
-            })
-        };
-
-        function draw_jitter(s) {
-          s.attr('r', options.datapoints.radius)
-            .attr('fill', function(d) {
-              return colorScale(d[options.data.color_index])
-            })
-            .attr('cx', function(d) {
-              var w = xScale.rangeBand();
-              return Math.floor(Math.random() * w)
-            })
-            .attr('cy', function(d) {
-              return yScale(d[options.axes.y.label])
-            })
-        };
-
-
-
-        function create_histplot(g, i) {
-
-          var s = d3.select(this).append('g')
-            .attr('class', 'explodingHistplot bar')
-            .attr('id', 'explodingHistplot_box' + options.id + i)
-            .selectAll('.box')
-            .data([g])
-            .enter()
-
-          // s.append('line').attr('class', 'explodingBoxplot line max vline') //max vline
-          s.append('rect').attr('class', 'bar')
-
-        };
 
         function draw_histplot(g, i) {
-          //Draw svg
-          d3.select('#explodingHistplot_box' + options.id + i)
-            .on('click', function(d) {
-              // explode_boxplot(i);
-              // exploded_box_plots.push(i);
-            })
 
-          var s = d3.select(this);
-
-
-          var bar = s.selectAll('#explodingHistplot_box' + options.id + i)
-          .selectAll('rect')
-              .data(g)
-            bar.enter().
-            append("rect")
-              .attr("class", "bar")
-                .attr('id', 'bar'+g.group);
-
-
-              bar.exit().remove()
-
-          // bar.append("rect")
-              bar.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
-              .attr("xScale", 1)
-              .attr("width", (xScale(g[0].dx) - xScale(0)) - 1)
-              .attr("height", function(d) {
-                return  options.height - options.margins.top - options.margins.bottom - yScale(d.y);
-                // return options.height - yScale(d.y);
-               })
-              .attr("fill", function(d) { return colorScale(d.y) })
-                    .style("opacity", 0.6)
-              .on("mouseover",  function(d){if (events.point && typeof events.point.mouseover == 'function') {
-                     events.point.mouseover(d, i, d3.select(this), constituents, options);
-                  }})
-                .on("mouseout", function(d){  if (events.point && typeof events.point.mouseout == 'function') {
-                       events.point.mouseout(d, i, d3.select(this), constituents, options);
-                    }});
-
-        };
-
-        function create_scatterplot(g, i) {
-
-
-
-          var highlight = function(d) {
+          var highlight = function(e,d) {
             // console.log("mouseover detected");
             // selected_specie = d.site
-            d3.selectAll(".dot")
+            d3.selectAll(".bar")
               .transition()
               .duration(200)
-              .attr('fill-opacity', "0.25")
-              .attr("r",2.5)
+              .attr('fill-opacity', "0.05")
 
-            d3.selectAll("#dot"+ d.site)
+
+            d3.selectAll("#bar"+ d.site)
               .transition()
               .duration(200)
                 .attr('fill-opacity', "1.0")
-              .attr("r", 5)
+
               if (events.point && typeof events.point.mouseover == 'function') {
-                   events.point.mouseover(d, i, d3.select(this), constituents, options);
+                   events.point.mouseover(e,d, d3.select(this), constituents, options);
                 }
           }
 
           // Highlight the specie that is hovered
           var doNotHighlight = function(d) {
-            d3.selectAll(".dot")
+            d3.selectAll(".bar")
               .transition()
               .duration(200)
                 .attr('fill-opacity', "1.0")
-              .attr("r", 4)
+
 
               if (events.point && typeof events.point.mouseout == 'function') {
                    events.point.mouseout(d, i, d3.select(this), constituents, options);
                 }
           }
 
-          var color = colorScale(g.group);
-
-          var ycum = d3.scale.linear().domain(histNonLinDom).range(histNonLinRange);
-
-            var s = d3.select('#' + 'explodingHistplot' + options.id + i)
-            .selectAll('circle')
+          var s = d3.select('#' + 'explodingHistplot' + options.id + i)
+            .selectAll('rect')
             .data(g)
-          s.enter()
-            .append("circle")
-            .attr('class', 'dot')
-              .attr('id', 'dot'+g.group)
-            s.exit().remove()
+            .join(
+              function(enter) {
+                return enter
+                  .append("rect")
+                  .attr("class", "bar")
+                  .attr('id', 'bar' + g.group)
 
-              s.attr("cx", function(d) {
-              return xScale(d.x);
-            })
-            .attr("cy", function(d) {
-              // console.log(ycum(d.cum));
-              return ycum(d.cum);
-            })
-            .attr("r", function(d) {
-              return (4);
-            })
-            .style("fill", function(d) {
-              return color
-            })
+                  .attr("transform", function(d) {
+                    return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")";
+                  })
+                  // .attr("xScale", 1)
+                  // .attr("width", Math.abs(xScale(g[0].x1) - xScale(g[0].x0)))
+
+                   .attr("width",  options.width/(numBins))
+                  .attr("height", function(d) {
+                    return options.height - options.margins.top - options.margins.bottom - yScale(d.length);
+                    // return options.height - yScale(d.y);
+                  })
+                  .attr("fill", function(d) {
+                    return colorScale(d.site)
+                  })
+                  .style("opacity", 0.6)
+
+              },
+              function(update) {
+                return update
+                  .attr("transform", function(d) {
+                    return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")";
+                  })
+                  // .attr("xScale", 1)
+                  // .attr("width", (xScale(g[0].x1) - xScale(g[0].x0)) - 1)
+                 .attr("width",  options.width/(numBins))
+                  .attr("height", function(d) {
+                    return options.height - options.margins.top - options.margins.bottom - yScale(d.length);
+                    // return options.height - yScale(d.y);
+                  })
+                  .attr("fill", function(d) {
+                    return colorScale(d.site)
+                  })
+                  .style("opacity", 0.6)
+              },
+              function(exit) {
+                return exit
+                  .remove();
+              }
+            )
             .on("mouseover", highlight)
             .on("mouseleave", doNotHighlight )
-
-        };
-
-        function draw_scatterplot(g, i) {
-          //Draw svg
-          d3.select('#explodingHistplot_box' + options.id + i)
-            .on('click', function(d) {
-              // explode_boxplot(i);
-              // exploded_box_plots.push(i);
-            })
-
-          var s = d3.select(this);
-
-
-          // var ycum = d3.scale.linear().domain([0, 1]).range([options.height - options.margins.top - options.margins.bottom, 0]);
-          var ycum = d3.scale.linear().domain(histNonLinDom).range(histNonLinRange);
-
-          var guide = d3.svg.line()
-            .x(function(d) {
-              return xScale(d.x);
-            })
-            .y(function(d) {
-
-              return ycum(d.cum);
-            })
-            .interpolate('basis');
-
-          s.select('path')
-            .datum(g)
-            .attr('d', guide)
-            .attr('stroke', function(d) {
-              return colorScale(d.site);
-            });
-
-        };
-
-        function hide_boxplot(g, i) {
-        };
-
-        function explode_boxplot(i) {
-        };
-
-        function jitter_plot(i) {
-        };
-
-        function implode_boxplot(elem, g) {
-
-        };
-
-
-
-        function zoom() {
-          // console.log("zoom detected");
-
-          chartRoot.select(".explodingHistplot.x.axis").call(xAxis);
-          // chartRoot.select(".y.axis").call(yAxis);
-
-          chartRoot.selectAll(".bar")
-            // .attr("transform", transform);
-            .attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
-            // .attr("cx", function(d) {
-            //   return xScale(d.x);
+            // .on("mouseover", function(e, d) {
+            //   if (events.point && typeof events.point.mouseover == 'function') {
+            //     events.point.mouseover(e, d, d3.select(this), constituents, options);
+            //   }
             // })
-        }
+            // .on("mouseout", function(d) {
+            //   if (events.point && typeof events.point.mouseout == 'function') {
+            //     events.point.mouseout(d, i, d3.select(this), constituents, options);
+            //   }
+            // });
+
+          //
+          // bar.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
+          // .attr("xScale", 1)
+          // .attr("width", (xScale(g[0].dx) - xScale(0)) - 1)
+          // .attr("height", function(d) {
+          //   return  options.height - options.margins.top - options.margins.bottom - yScale(d.y);
+          //   // return options.height - yScale(d.y);
+          //  })
+          // .attr("fill", function(d) { return colorScale(d.y) })
+          //       .style("opacity", 0.6)
+          // .on("mouseover",  function(d){if (events.point && typeof events.point.mouseover == 'function') {
+          //        events.point.mouseover(d, i, d3.select(this), constituents, options);
+          //     }})
+          //   .on("mouseout", function(d){  if (events.point && typeof events.point.mouseout == 'function') {
+          //          events.point.mouseout(d, i, d3.select(this), constituents, options);
+          //       }});
+          // var bar = s.selectAll('#explodingHistplot_box' + options.id + i)
+          // .selectAll('rect')
+          //     .data(g)
+          //
+          //   bar.enter().
+          //   append("rect")
+          //     .attr("class", "bar")
+          //       .attr('id', 'bar'+g.group);
+          //
+          //
+          //     bar.exit().remove()
+          //
+          // // bar.append("rect")
+          //     bar.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
+          //     .attr("xScale", 1)
+          //     .attr("width", (xScale(g[0].dx) - xScale(0)) - 1)
+          //     .attr("height", function(d) {
+          //       return  options.height - options.margins.top - options.margins.bottom - yScale(d.y);
+          //       // return options.height - yScale(d.y);
+          //      })
+          //     .attr("fill", function(d) { return colorScale(d.y) })
+          //           .style("opacity", 0.6)
+          //     .on("mouseover",  function(d){if (events.point && typeof events.point.mouseover == 'function') {
+          //            events.point.mouseover(d, i, d3.select(this), constituents, options);
+          //         }})
+          //       .on("mouseout", function(d){  if (events.point && typeof events.point.mouseout == 'function') {
+          //              events.point.mouseout(d, i, d3.select(this), constituents, options);
+          //           }});
+
+        };
+
+
+
+
 
         // function transform(d) {
         //   return "translate(" + xScale(d.x) + "," + yScale(d.cum) + ")";
@@ -691,11 +683,11 @@ return(
       return m[value];
     }).sort(d3.ascending);
 
-    var xScale = d3.scale.linear().domain(histValueRange).range([0, width]);
-    var hist_data = d3.layout.histogram().bins(xScale.ticks(numBins))(seriev);
+    var xScale = d3.scaleLinear().domain(histValueRange).range([0, width]);
+    var hist_data = d3.histogram().thresholds(xScale.ticks(numBins))(seriev);
 
-    for (var i = 1; i < hist_data.length; i++) {
-      hist_data[i].site =data[0]["SITE_NUM"];
+    for (var i = 0; i < hist_data.length; i++) {
+      hist_data[i].site = data[0]["SITE_NUM"];
     }
     //
     // var jstat = this.jStat(seriev);

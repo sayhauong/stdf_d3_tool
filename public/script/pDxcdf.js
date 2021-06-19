@@ -12,7 +12,7 @@
    }
 
    cdfPlotFunctions.showTooltip = showTooltip;
-   function showTooltip (d, i, element, constituents, options) {
+   function showTooltip (e, d, element, constituents, options) {
       if (!$(element).popover) return;
       $(element).popover({
          placement: 'auto top',
@@ -41,23 +41,18 @@
             .direction('n')
             .html(tipFunction)
 
-       function tipFunction(d) {
+       function tipFunction(e,d) {
 
           var color = options.data.color_index && d[options.data.color_index] ?
              constituents.scales.color(d[options.data.color_index]) : 'blue';
-          // var identifier = options.data.identifier && d[options.data.identifier] ?
-          //    d[options.data.identifier] : 'undefined';
-          // var value = options.axes.y.label && d[options.axes.y.label] ?
-          //    options.axes.y.tickFormat(d[options.axes.y.label]) : '';
+
           var site = "site: " + d.site ;
           var identifier = "x: " + (Math.round( d.x * 10000) / 10000).toFixed(5);
           var value ="cumm: " + (Math.round( d.cum  * 10000) / 10000).toFixed(5);
           var message = ' <span style="color:#DDDDDD; block:inline">' + site +
                          '</span><span class="tipInfo" style="color:#DDDDDD; block:inline" >  ' + identifier +
                           '</span><span class="tipInfo" style="color:#DDDDDD; block:inline" >  ' + value + '</span>';
-          // var message = ' <span style="color:' + color + '">' + identifier +
-          //               '</span><span style="color:#DDDDDD;" > : ' + value + '</span>';
-// console.log(message);
+
           return message;
        }
 
@@ -72,8 +67,8 @@
 
       var container = d3.select('#pointDistributions');
 
-      d3.json(default_distributions, function(error, result) {
-         if (error || !result) {
+      d3.json(default_distributions).then( function(result) {
+         if ( !result) {
            // console.log(error);
            return;
          }
@@ -98,10 +93,8 @@
                width: 700,
                height: 480,
                axes: {
-                  // x: { label: 'Set Score' },
-                  // y: { label: 'Total Points' }
                   x: { label: 'Site' },
-                    y: { label: testName }
+                  y: { label: testName }
 
                }
             }

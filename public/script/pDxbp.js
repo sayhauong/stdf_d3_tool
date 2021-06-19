@@ -45,8 +45,8 @@
        function tipFunction(e,d) {
           var color = options.data.color_index && d[options.data.color_index] ?
              constituents.scales.color(d[options.data.color_index]) : 'blue';
-          var identifier = options.data.identifier && d[options.data.identifier] ?
-             d[options.data.identifier] : 'undefined';
+          var identifier = options.data.group && d[options.data.group] ?
+             options.data.group + d[options.data.group] : 'undefined';
           var value = options.axes.y.label && d[options.axes.y.label] ?
              options.axes.y.tickFormat(d[options.axes.y.label]) : '';
           var message = ' <span style="color:' + color + '">' + identifier +
@@ -77,10 +77,10 @@
 
          xbp.events({ 'update': { 'ready': defineTooltip } });
 
-         // if (tooltip) {
-         //    if (tooltip == 'popover') xbp.events({ 'point': { 'mouseover': showTooltip, 'mouseout': removeTooltip } });
-         //    if (tooltip == 'd3-tip') xbp.events({ 'update': { 'ready': defineTooltip } });
-         // }
+         if (tooltip) {
+            if (tooltip == 'popover') xbp.events({ 'point': { 'mouseover': showTooltip, 'mouseout': removeTooltip } });
+            if (tooltip == 'd3-tip') xbp.events({ 'update': { 'ready': defineTooltip } });
+         }
 // console.log(result.limit[0][testName]);
          xbp.options(
             {
