@@ -67,7 +67,7 @@
 
       var container = d3.select('#pointDistributions');
 
-      d3.json(default_distributions).then( function(result) {
+      d3.json(stdf_loaded_json).then( function(result) {
          if ( !result) {
            // console.log(error);
            return;

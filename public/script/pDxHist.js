@@ -72,7 +72,7 @@
 
       var container = d3.select('#pointDistributions');
 
-      d3.json(default_distributions).then( function(result) {
+      d3.json(stdf_loaded_json).then( function(result) {
          if ( !result) {
            // console.log(error);
            return;
@@ -122,37 +122,37 @@
      var viztable = vizcontrol.append('table').attr('align', 'center');
 
 
-     for (var key in result.limit) {
-
-viztable.append('tr').append('td').attr('align', 'left');
-       // var li = document.createElement("a");
-       // li.setAttribute("id", key);
-       //   li.setAttribute("href", '#');
-       // li.appendChild(document.createTextNode(result.limit[key]['TEST_NUM'] + ":" + key));
-       // li.classList.add("list-group-item", "list-group-item-action", "test-name");
-       // li.addEventListener('click', function(e) {
-       //
-       //
-       //    if (plotType === "HIST") {
-       //     histPlotFunctions.xbp.options({
-       //       //set limit plot here
-       //       limitRangeType: 'limit',
-       //       axes: {
-       //         y: {
-       //           // label: e.target.innerText
-       //           label: e.target.id
-       //         }
-       //       }
-       //     });
-       //     // container.call(xbp);
-       //     histPlotFunctions.xbp.update();
-       //   }
-       // });
-       // ul.appendChild(li);
-
-
-
-     }
+//      for (var key in result.limit) {
+//
+// viztable.append('tr').append('td').attr('align', 'left');
+//        // var li = document.createElement("a");
+//        // li.setAttribute("id", key);
+//        //   li.setAttribute("href", '#');
+//        // li.appendChild(document.createTextNode(result.limit[key]['TEST_NUM'] + ":" + key));
+//        // li.classList.add("list-group-item", "list-group-item-action", "test-name");
+//        // li.addEventListener('click', function(e) {
+//        //
+//        //
+//        //    if (plotType === "HIST") {
+//        //     histPlotFunctions.xbp.options({
+//        //       //set limit plot here
+//        //       limitRangeType: 'limit',
+//        //       axes: {
+//        //         y: {
+//        //           // label: e.target.innerText
+//        //           label: e.target.id
+//        //         }
+//        //       }
+//        //     });
+//        //     // container.call(xbp);
+//        //     histPlotFunctions.xbp.update();
+//        //   }
+//        // });
+//        // ul.appendChild(li);
+//
+//
+//
+//      }
 
       var data;
       var original_width;

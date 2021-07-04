@@ -24,22 +24,22 @@ app.use(formidableMiddleware({
 }));
 
 
-const homeStartingContent = "This is a tool to read and analyze stdf";
-const contactContent = "Made by SayHau Ong";
+const homeStartingContent = "This is an example tool to read and analyze stdf. I started this project to read stdf with stdfjs and visualize the data by d3. I used the histogram template by Charles Allen and ported everything to D3V6. The tool can take STDF and parse it into JSON record, however, i have limited the data to an example JSON. There are so much more touching up needs to be done, along with many more exciting features that is possible (e.g: X vs Y plot, wafer map, data binding etc) but Unfortunately i have to stop at this point as this is taking too much time and i am moving to next project. If you see an opportunity and interested to industrialize it please don't hesitate to contact me.";
+const contactContent = "For more possibilities or inquiries please contact : ";
 
-const path = __dirname + "\\data\\"+ "test.json";
-console.log(path);
-var jsonSample = require(path);
-
+// const path = __dirname + "\\data\\"+ "test.json";
+// console.log(path);
+// var jsonSample = require(path);
+ const jsonDataPath = __dirname + "\\public\\data\\";
 
 var rawRecsJson = [];
 var processedRecsJson = [];
-var keysRec = [];
+let keysRec = "";
 
 var limJson = {};
 var prrsRec = [];
 var csvRec = [];
-
+var jsonData;
 // prrsRec = jsonSample;
 
 
@@ -63,7 +63,7 @@ app.get("/", function(req, res) {
     // posts: posts
   });
 
-  console.log(jsonSample.length);
+  // console.log(jsonSample.length);
 });
 
 app.get("/about", function(req, res) {
@@ -83,19 +83,17 @@ app.get("/filepond", function(req, res) {
 });
 
 app.delete("/filepond", function(req, res) {
-     console.log("entering delete");
-   console.log(req.fields.id);
-   var path = req.fields.id;
-   path = path.replace(/\\\\/g, "\\");
-    path = path.replace(/"/g, "");
-   // path = path.replace("uploads\\\\", "");
-   console.log(__dirname + "\\"+  path);
-   const fs = require('fs')
-   try {
-  fs.unlinkSync( __dirname + "\\"+  path)
-  //file removed
+  var path = req.fields.id;
+  path = path.replace(/\\\\/g, "\\");
+   path = path.replace(/"/g, "");
+  // path = path.replace("uploads\\\\", "");
+  console.log(__dirname + "\\"+  path);
+  const fs = require('fs')
+  try {
+ fs.unlinkSync( __dirname + "\\"+  path)
+ //file removed
 } catch(err) {
-  console.error(err)
+ console.error(err)
 }
 });
 
@@ -205,7 +203,7 @@ var jsonPlotData={};
 jsonPlotData["data"]= [...prrsRec];
 jsonPlotData["limit"]= {...limJson};
 
-          var jsonData = JSON.stringify(jsonPlotData);
+          jsonData = JSON.stringify(jsonPlotData);
           // console.log(jsonData);
           fs.writeFile(__dirname + "\\data\\"+ newFileName  + ".json", jsonData, function(err) {
             if (err) throw err;
@@ -216,12 +214,27 @@ jsonPlotData["limit"]= {...limJson};
           fs.writeFile(__dirname + "\\data\\"+ newFileName  + ".csv", csv, function(err) {
             if (err) throw err;
              // res.send( {'id': req.files.filepond.path});
-              res.send(JSON.stringify( req.files.filepond.path));
+              // res.send(JSON.stringify( req.files.filepond.path));
           });
+
+
 
   }) // end of reading STDF record
 
+
+
+//remove uploaded file once processing is done
+  try {
+ fs.unlinkSync( __dirname + "\\"+  req.files.filepond.path)
+   console.log("removed: " + __dirname + "\\"+  req.files.filepond.path);
+ //file removed
+} catch(err) {
+ console.error(err)
+}
+
 console.log('done: ' + req.files.filepond.path);
+
+res.redirect("/");
 });
 
 
@@ -253,25 +266,41 @@ app.get("/post", function(req, res){
 
 });
 
+let jsonDataFiles ;
 app.get("/bxplot", function(req, res){
-  // const requestedTitle = _.lowerCase(req.params.postName);
 
-    // keysRec=(Object.keys(prrsRec[0]));
-    keysRec="";
-// console.log(keysRec.length);
+  fs.readdir(jsonDataPath, (err,files)=>{
+    files.forEach(file=>{
+      if (file.indexOf(".json") !== -1 ){
+        jsonDataFiles.push(file);
+        console.log(jsonDataFiles);}
+    });
+  });
+
+
+keysRec = "sample_data.json";
   res.render("bxplot", {
     title: "",
-    content: "",
+    content :"",
+    testRecordArray: jsonDataFiles,
     testRecords : keysRec
   } );
+
+jsonDataFiles = [];
+
+});
+
+app.post("/bxplot", function(req, res){
+
+console.log("post triggered");
+keysRec = "sample_data.json";
+
+res.redirect("/bxplot")
 
 });
 
 app.get("/histplot", function(req, res){
-  // const requestedTitle = _.lowerCase(req.params.postName);
-
-    // keysRec=(Object.keys(prrsRec[0]));
-    keysRec="";
+keysRec = "sample_data.json";
 console.log(keysRec.length);
   res.render("histplot", {
     title: "",
@@ -283,11 +312,7 @@ console.log(keysRec.length);
 });
 
 app.get("/cdfplot", function(req, res){
-  // const requestedTitle = _.lowerCase(req.params.postName);
-
-    // keysRec=(Object.keys(prrsRec[0]));
-    keysRec="";
-// console.log(keysRec.length);
+  keysRec = "sample_data.json";
   res.render("cdfplot", {
     title: "",
     content: "",
@@ -296,6 +321,6 @@ app.get("/cdfplot", function(req, res){
 
 });
 
-app.listen(3030, function() {
+app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3030");
 });

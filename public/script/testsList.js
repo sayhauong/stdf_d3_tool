@@ -13,7 +13,7 @@
     var ul = document.getElementById("tests-list");
 
     // d3.json(default_distributions, function(error, result) {
-      d3.json(default_distributions).then( function(result) {
+      d3.json(stdf_loaded_json).then( function(result) {
       // if (error || !result) {
       //   console.log(error);
       //   return;

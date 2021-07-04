@@ -10,42 +10,42 @@
 <script src="/script/d3box.js"></script> -->
 
 <div id="container" class="container-fluid text-center">
-    <h5 id='title' style="color: #3B3B3B;"></h5>
-    <div class="col-sm-2" >
-      <div>
-        <input type="text" id="search-input"  placeholder="Search for names..">
-        </div>
-        <div class="list-group" id="tests-list">
-        </div>
-         <!-- <ul class="list-group"  id="testsList" ></ul> -->
+  <h5 id='title' style="color: #3B3B3B;"></h5>
+  <div class="col-sm-2">
+    <div>
+      <input type="text" id="search-input" placeholder="Search for names..">
     </div>
-    <div class="col-sm-8">
-       <div id="pointDistributions"></div>
+    <div class="list-group" id="tests-list">
     </div>
-    <div class="col-sm-2">
-       <div id="controls">
-       </div>
+    <!-- <ul class="list-group"  id="testsList" ></ul> -->
+  </div>
+  <div class="col-sm-8">
+    <div id="pointDistributions"></div>
+  </div>
+  <div class="col-sm-2">
+    <div id="controls">
     </div>
- </div>
+  </div>
+</div>
 <script src="/script/globalJs.js"></script>
 <script src="https://d3js.org/d3.v6.min.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.min.js"></script>
- -->
- <!-- <script src=	"https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script> -->
- <script src="https://unpkg.com/d3-v6-tip@1.0.6/build/d3-v6-tip.js"></script>
+
+<script src="https://unpkg.com/d3-v6-tip@1.0.6/build/d3-v6-tip.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bumbeishvili/d3-tip-for-v6@4/d3-tip.min.css">
 
 <script src="/script/pDxbp.js"></script>
 <script src="/script/explodingBoxplot.js"></script>
 <script src="/script/testsList.js"></script>
- <script>
-    // boxPlotFunctions.defaultDistribution('popover');
-const testName = 'contact_par:gpio0:V_ESD_GND_SHRT_IO';
-    boxPlotFunctions.defaultDistribution('d3-tip', testName);
+<script>
+  let stdfJsonFiles = " <%= testRecordArray %>";
+  stdf_loaded_json = stdf_loaded_json + "<%= testRecords %>";
 
-    testsListFunction.popTestsList("BOX");
-      boxPlotFunctions.demoSetup();
- </script>
+  const testName = 'ghijklmn:0:V0';
+  boxPlotFunctions.defaultDistribution('d3-tip', testName);
+
+  testsListFunction.popTestsList("BOX");
+  boxPlotFunctions.demoSetup();
+</script>
 
 
 <%- include("partials/footer"); -%>
