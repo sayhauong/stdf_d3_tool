@@ -269,13 +269,13 @@ app.get("/post", function(req, res){
 let jsonDataFiles ;
 app.get("/bxplot", function(req, res){
 
-  fs.readdir(jsonDataPath, (err,files)=>{
-    files.forEach(file=>{
-      if (file.indexOf(".json") !== -1 ){
-        jsonDataFiles.push(file);
-        console.log(jsonDataFiles);}
-    });
-  });
+  // fs.readdir(jsonDataPath, (err,files)=>{
+  //   files.forEach(file=>{
+  //     if (file.indexOf(".json") !== -1 ){
+  //       jsonDataFiles.push(file);
+  //       console.log(jsonDataFiles);}
+  //   });
+  // });
 
 
 keysRec = "sample_data.json";
