@@ -304,10 +304,9 @@ app.get("/cdfplot", function(req, res){
   res.render("cdfplot", {
     title: "",
     content: "",
-    testRecordArray: jsonDataFiles,
     testRecords : keysRec
   } );
-jsonDataFiles = [];
+
 });
 
 app.get("/histplot", function(req, res){
