@@ -52,7 +52,7 @@ app.use(bodyParser.json({
   extended: true
 }));
 
-app.use(express.static(__dirname+"\\public"));
+app.use(express.static("public"));
 
 // let posts = [];
 
