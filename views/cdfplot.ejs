@@ -50,7 +50,7 @@ const testName = 'ghijklmn:0:V0';
  <script src="/script/pDxbp.js"></script>
  <script src="/script/explodingBoxplot.js"></script>
  <script src="/script/testsList.js"></script>
- <script>
+ <!-- <script>
 
    stdf_loaded_json = stdf_loaded_json + "<%= testRecords %>";
 
@@ -59,6 +59,14 @@ const testName = 'ghijklmn:0:V0';
 
    testsListFunction.popTestsList("BOX");
    boxPlotFunctions.demoSetup();
+ </script> -->
+
+ <script>
+stdf_loaded_json = stdf_loaded_json + "<%= testRecords %>";
+const testName = 'ghijklmn:0:V0';
+    boxPlotFunctions.defaultDistribution('d3-tip', testName);
+    // cdfPlotFunctions.demoSetup();
+    testsListFunction.popTestsList("CDF");
  </script>
 
 <%- include("partials/footer"); -%>
