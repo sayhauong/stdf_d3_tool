@@ -299,16 +299,6 @@ res.redirect("/bxplot")
 
 });
 
-app.get("/cdfplot", function(req, res){
-  keysRec = "sample_data.json";
-  res.render("cdfplot", {
-    title: "",
-    content: "",
-    testRecords : keysRec
-  } );
-
-});
-
 app.get("/histplot", function(req, res){
 keysRec = "sample_data.json";
 console.log(keysRec.length);
@@ -321,7 +311,15 @@ console.log(keysRec.length);
 
 });
 
+app.get("/cdfplot", function(req, res){
+  keysRec = "sample_data.json";
+  res.render("cdfplot", {
+    title: "",
+    content: "",
+    testRecords : keysRec
+  } );
 
+});
 
 // app.listen(process.env.PORT || 3000, function() {
 //   console.log("Server started on port 3000");
