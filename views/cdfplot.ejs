@@ -43,6 +43,7 @@ const testName = 'ghijklmn:0:V0';
     testsListFunction.popTestsList("CDF");
  </script> -->
  <script src="/script/globalJs.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.3/jstat.min.js"></script>
  <script src="https://d3js.org/d3.v6.min.js"></script>
  <script src="https://unpkg.com/d3-v6-tip@1.0.6/build/d3-v6-tip.js"></script>
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bumbeishvili/d3-tip-for-v6@4/d3-tip.min.css">
@@ -66,7 +67,7 @@ stdf_loaded_json = stdf_loaded_json + "<%= testRecords %>";
 const testName = 'ghijklmn:0:V0';
     boxPlotFunctions.defaultDistribution('d3-tip', testName);
     // cdfPlotFunctions.demoSetup();
-     // boxPlotFunctions.demoSetup();
+     boxPlotFunctions.demoSetup();
     testsListFunction.popTestsList("CDF");
  </script>
 
