@@ -96,12 +96,12 @@
                   color_index: 'Site',
                   identifier: 'h2h'
                },
-               width: 700,
-               height: 480,
+               width: 800,
+               height: 600,
                axes: {
                   // x: { label: 'Set Score' },
                   // y: { label: 'Total Points' }
-                  x: { label: 'Site' },
+                  x: { label: 'Mesaures value' },
                     y: { label: testName }
 
                }

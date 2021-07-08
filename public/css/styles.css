@@ -18,8 +18,8 @@ html, body {
   /* Remove padding */
   margin: auto;
   /* Remove margins */
-  font-size: 9px;
-  height: 500px;
+  font-size: 12px;
+  height: 550px;
   overflow: hidden;
   overflow-y: scroll;
   word-wrap: break-word;
@@ -40,7 +40,7 @@ html, body {
   /* Remove bullets */
   margin: 5px auto;
   width: 100%;
-  font-size: 9px;
+  font-size: 12px;
   /* border: 2px; */
   /* display: block; */
   /* word-wrap: break-word; */
@@ -54,6 +54,10 @@ html {
   position: relative;
 }
 
+.container {
+  margin-left: 15%;
+  margin-right: 15%;
+}
 .container-fluid {
   padding-top: 70px;
   padding-bottom: 70px;

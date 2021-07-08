@@ -279,6 +279,8 @@ function explodingCdfplot() {
             function(enter) {
               return enter.append('g')
                 .attr("clip-path", "url(#clip)")
+                // .attr("transform", "translate((-options.margins.top *0.95 - d3.mean(yScale.range())) (-options.margins.left +10))" )
+                  .attr("transform", "translate(10 0)" )
                 .attr('class', 'explodingCdfplot y axis')
                 .attr('id', 'xpb_yAxis')
                 .call(yAxis, yScale)
@@ -286,8 +288,8 @@ function explodingCdfplot() {
                 .attr('class', 'axis text')
                 .attr("transform", "rotate(-90)")
                 .attr("x", -options.margins.top *0.95 - d3.mean(yScale.range()))
-                .attr("dy", ".71em")
-                .attr('y', -options.margins.left+5 )
+                .attr("dy", ".99em")
+                .attr('y', -options.margins.left -15 )
                 .style("text-anchor", "middle")
                 .text(options.axes.y.label);
             },
@@ -304,8 +306,8 @@ function explodingCdfplot() {
           .select('.axis.text')
           .attr("transform", "rotate(-90)")
           .attr("x", -options.margins.top *0.95 - d3.mean(yScale.range()))
-          .attr("dy", ".71em")
-          .attr('y', -options.margins.left+5 )
+          .attr("dy", ".99em")
+          .attr('y', -options.margins.left  )
           .style("text-anchor", "middle")
           .text(options.axes.y.label);
 

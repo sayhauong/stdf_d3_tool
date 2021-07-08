@@ -335,7 +335,7 @@ function explodingHistplot() {
                 .attr("transform", "rotate(-90)")
                 .attr("x", -options.margins.top * 0.95 - d3.mean(yScale.range()))
                 .attr("dy", ".71em")
-                .attr('y', -options.margins.left + 5)
+                .attr('y', -options.margins.left )
                 .style("text-anchor", "middle")
                 .text(options.axes.y.label);
             },
@@ -353,7 +353,7 @@ function explodingHistplot() {
           .attr("transform", "rotate(-90)")
           .attr("x", -options.margins.top * 0.95 - d3.mean(yScale.range()))
           .attr("dy", ".71em")
-          .attr('y', -options.margins.left + 5)
+          .attr('y', -options.margins.left )
           .style("text-anchor", "middle")
           .text(options.axes.y.label);
 
