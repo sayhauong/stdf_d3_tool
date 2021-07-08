@@ -24,7 +24,8 @@ app.use(formidableMiddleware({
 }));
 
 
-const homeStartingContent = "This is an example tool to read and analyze stdf. I started this project to read stdf with stdfjs and visualize the data by d3. I used the histogram template by Charles Allen and ported everything to D3V6. The tool can take STDF and parse it into JSON record, however, i have limited the data to an example JSON for now, as this is a free server. \n\nThere are some touching up to be done, along with many more possible exciting features (e.g: X vs Y plot, wafer map, data binding, RnR, dynamic CPK analaysis etc) but Unfortunately i have to stop at this point as this is quite resource extensive and i am moving to next project. If you see the potential and interested to industrialize it please don't hesitate to contact me.";
+const homeStartingContent = "This is an example tool to read and analyze stdf. I started this Nodejs project to read stdf with stdfjs and visualize the data by d3. I used the histogram template by Charles Allen and ported everything to D3V6. The tool can take STDF and parse it into JSON record, however, i have limited the data to an example JSON for now, as this is a free server."
+const secondaryContent = "There are some touching up to be done, along with many more possible exciting features (e.g: X vs Y plot, wafer map, data binding, RnR, dynamic CPK analaysis etc) but Unfortunately i have to stop at this point as this is quite resource extensive and i am moving to next project. If you see the potential and interested to industrialize it please don't hesitate to contact me.";
 const contactContent = "For more possibilities or inquiries please contact : ";
 
 // const path = __dirname + "\\data\\"+ "test.json";
@@ -60,7 +61,7 @@ app.use(express.static("public"));
 app.get("/", function(req, res) {
   res.render("home", {
     startingContent: homeStartingContent,
-    // posts: posts
+    secondaryContent: secondaryContent
   });
 
   // console.log(jsonSample.length);
