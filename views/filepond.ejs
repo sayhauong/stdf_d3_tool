@@ -3,16 +3,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
 
 <h1>Drop File Area</h1>
-<!-- <form class="" action="/drop" method="post"> -->
 
-
-<!-- <form id="upload-widget" method="post" action="/drop" class="dropzone"></form> -->
-<!-- </div> -->
-<!-- <button class="btn btn-primary" type="submit" name="button">Publish</button> -->
-<!-- <form action="/filepond" enctype="multipart/form-data" method="POST"> -->
+<br>
+<p>
+  This is currently disable. You can find a section of code in this page parsing HTTP request to server(if you want to explore it). The server has coded to convert the STDF to a JSON object and a CSV. 
+  </p>
 <input type="file">
 
-<!-- </form> -->
+
 <script>
   // prettier-ignore
   [{
@@ -54,92 +52,42 @@
   // Easy console access for testing purposes
   window.pond = pond;
 
-  FilePond.setOptions({
-    server: {
-      process: './filepond',
-      fetch: null,
-
-      revert: (uniqueFileId, load, error) => {
-
-       // const request = new XMLHttpRequest();
-       //            request.open('DELETE', uniqueFileId);
-        const XHR = new XMLHttpRequest();
-
-    // Define what happens on successful data submission
-    XHR.addEventListener( 'load', function(event) {
-      alert( 'Yeah! Data sent and response loaded.' );
-    } );
-
-    // Define what happens in case of error
-    XHR.addEventListener( 'error', function(event) {
-      alert( 'Oops! Something went wrong.' );
-    } );
-
-    // Set up our request
-    XHR.open( 'DELETE', './filepond' );
-
-    // Add the required HTTP header for form data POST requests
-    XHR.setRequestHeader( 'Content-Type', 'json' );
-    jsonId = {'id':uniqueFileId};
-    console.log(uniqueFileId);
-    // Finally, send our data.
-    XHR.send(JSON.stringify(jsonId));
-      }
-    }
-
-  });
-
+//disable for heroku
   // FilePond.setOptions({
-  //     server: {
-  //         process:(fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+  //   server: {
+  //     process: './filepond',
+  //     fetch: null,
   //
-  //             // fieldName is the name of the input field
-  //             // file is the actual file object to send
-  //             const formData = new FormData();
-  //             console.log(fieldName);
-  //             console.log( file);
-  //             console.log( file.name);
-  //             formData.append(fieldName, file, file.name);
+  //     revert: (uniqueFileId, load, error) => {
   //
-  //             const request = new XMLHttpRequest();
-  //             request.open('POST', 'http://localhost:3000/filepond');
+  //      // const request = new XMLHttpRequest();
+  //      //            request.open('DELETE', uniqueFileId);
+  //       const XHR = new XMLHttpRequest();
   //
-  //             // Should call the progress method to update the progress to 100% before calling load
-  //             // Setting computable to false switches the loading indicator to infinite mode
-  //             request.upload.onprogress = (e) => {
-  //                 progress(e.lengthComputable, e.loaded, e.total);
-  //             };
+  //   // Define what happens on successful data submission
+  //   XHR.addEventListener( 'load', function(event) {
+  //     alert( 'Yeah! Data sent and response loaded.' );
+  //   } );
   //
-  //             // Should call the load method when done and pass the returned server file id
-  //             // this server file id is then used later on when reverting or restoring a file
-  //             // so your server knows which file to return without exposing that info to the client
-  //             request.onload = function() {
-  //                 if (request.status >= 200 && request.status < 300) {
-  //                     // the load method accepts either a string (id) or an object
-  //                     load(request.responseText);
-  //                 }
-  //                 else {
-  //                     // Can call the error method if something is wrong, should exit after
-  //                     error('oh no');
-  //                 }
-  //             };
-  //             console.log('sending data');
-  //             request.send(formData);
+  //   // Define what happens in case of error
+  //   XHR.addEventListener( 'error', function(event) {
+  //     alert( 'Oops! Something went wrong.' );
+  //   } );
   //
-  //             // Should expose an abort method so the request can be cancelled
-  //             return {
-  //                 abort: () => {
-  //                     // This function is entered if the user has tapped the cancel button
-  //                     request.abort();
+  //   // Set up our request
+  //   XHR.open( 'DELETE', './filepond' );
   //
-  //                     // Let FilePond know the request has been cancelled
-  //                     abort();
-  //                 }
-  //             };
-  //         }
+  //   // Add the required HTTP header for form data POST requests
+  //   XHR.setRequestHeader( 'Content-Type', 'json' );
+  //   jsonId = {'id':uniqueFileId};
+  //   console.log(uniqueFileId);
+  //   // Finally, send our data.
+  //   XHR.send(JSON.stringify(jsonId));
   //     }
+  //   }
+  //
   // });
+
 </script>
-<!-- </form> -->
 
 <%- include("partials/footer"); -%>
