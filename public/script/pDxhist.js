@@ -101,7 +101,7 @@
                axes: {
                   // x: { label: 'Set Score' },
                   // y: { label: 'Total Points' }
-                  x: { label: 'Mesaures value' },
+                  x: { label: 'Mesaured value' },
                     y: { label: testName }
 
                }
