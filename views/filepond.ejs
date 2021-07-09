@@ -6,7 +6,7 @@
 
 <br>
 <p>
-  This is currently disable. You can find a section of code in this page parsing HTTP request to server(if you want to explore it). The server has coded to convert the STDF to a JSON object and a CSV. 
+  This is currently disable. You can find a section of code in this page parsing HTTP request to server(if you want to explore it). The server has coded to convert the STDF to a JSON object and a CSV.
   </p>
 <input type="file">
 
@@ -53,40 +53,40 @@
   window.pond = pond;
 
 //disable for heroku
-  // FilePond.setOptions({
-  //   server: {
-  //     process: './filepond',
-  //     fetch: null,
-  //
-  //     revert: (uniqueFileId, load, error) => {
-  //
-  //      // const request = new XMLHttpRequest();
-  //      //            request.open('DELETE', uniqueFileId);
-  //       const XHR = new XMLHttpRequest();
-  //
-  //   // Define what happens on successful data submission
-  //   XHR.addEventListener( 'load', function(event) {
-  //     alert( 'Yeah! Data sent and response loaded.' );
-  //   } );
-  //
-  //   // Define what happens in case of error
-  //   XHR.addEventListener( 'error', function(event) {
-  //     alert( 'Oops! Something went wrong.' );
-  //   } );
-  //
-  //   // Set up our request
-  //   XHR.open( 'DELETE', './filepond' );
-  //
-  //   // Add the required HTTP header for form data POST requests
-  //   XHR.setRequestHeader( 'Content-Type', 'json' );
-  //   jsonId = {'id':uniqueFileId};
-  //   console.log(uniqueFileId);
-  //   // Finally, send our data.
-  //   XHR.send(JSON.stringify(jsonId));
-  //     }
-  //   }
-  //
-  // });
+  FilePond.setOptions({
+    server: {
+      process: './filepond',
+      fetch: null,
+
+      revert: (uniqueFileId, load, error) => {
+
+       // const request = new XMLHttpRequest();
+       //            request.open('DELETE', uniqueFileId);
+        const XHR = new XMLHttpRequest();
+
+    // Define what happens on successful data submission
+    XHR.addEventListener( 'load', function(event) {
+      alert( 'Yeah! Data sent and response loaded.' );
+    } );
+
+    // Define what happens in case of error
+    XHR.addEventListener( 'error', function(event) {
+      alert( 'Oops! Something went wrong.' );
+    } );
+
+    // Set up our request
+    XHR.open( 'DELETE', './filepond' );
+
+    // Add the required HTTP header for form data POST requests
+    XHR.setRequestHeader( 'Content-Type', 'json' );
+    jsonId = {'id':uniqueFileId};
+    console.log(uniqueFileId);
+    // Finally, send our data.
+    XHR.send(JSON.stringify(jsonId));
+      }
+    }
+
+  });
 
 </script>
 
